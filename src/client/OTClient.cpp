@@ -78,8 +78,12 @@ OTClient::OTClient(
     const api::client::Activity& activity,
     const api::client::Contacts& contacts,
     const api::client::Workflow& workflow)
-    : m_pWallet(theWallet)
-    , api_(core)
+    :
+#if OT_CASH
+    m_pWallet(theWallet)
+    ,
+#endif
+    api_(core)
     , activity_(activity)
     , contacts_(contacts)
     , workflow_(workflow)
@@ -7498,6 +7502,9 @@ void OTClient::setRecentHash(
                 Identifier::Factory(theReply.m_strNymboxHash);
             context.SetLocalNymboxHash(NYMBOX_HASH);
         }
+    } else {
+        LogOutput(OT_METHOD)(__FUNCTION__)(": No hash provided by notary")
+            .Flush();
     }
 }
 
