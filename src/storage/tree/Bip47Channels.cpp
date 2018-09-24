@@ -340,7 +340,11 @@ proto::StorageBip47Contexts Bip47Channels::serialize() const
         }
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
     for (const auto& [id, data] : channel_data_) {
+#pragma GCC diagnostic pop
+
         const auto& [local, chain, contact, remote] = data;
         auto& index = *serialized.add_index();
         index.set_version(CHANNEL_INDEX_VERSION);

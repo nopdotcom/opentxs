@@ -947,7 +947,10 @@ bool OTClient::harvest_unused(ServerContext& context)
 
     // Loop through workflows to determine which issued numbers should not be
     // harvested
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
     for (const auto& [id, alias] : workflows) {
+#pragma GCC diagnostic pop
         const auto workflowID = Identifier::Factory(id);
         const auto workflow = workflow_.LoadWorkflow(nymID, workflowID);
 
@@ -998,9 +1001,11 @@ bool OTClient::harvest_unused(ServerContext& context)
         switch (workflow->type()) {
             case proto::PAYMENTWORKFLOWTYPE_OUTGOINGCHEQUE:
             case proto::PAYMENTWORKFLOWTYPE_OUTGOINGINVOICE: {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
                 auto [state, cheque] =
                     api::client::Workflow::InstantiateCheque(api_, *workflow);
-
+#pragma GCC diagnostic pop
                 if (false == bool(cheque)) {
                     otErr << OT_METHOD << __FUNCTION__
                           << ": Failed to load cheque" << std::endl;

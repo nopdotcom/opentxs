@@ -83,8 +83,11 @@ ContactSection ContactSection::operator+(const ContactSection& rhs) const
 
             OT_ASSERT(group);
         } else {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
             [[maybe_unused]] const auto [it, inserted] =
                 map.emplace(rhsID, rhsGroup);
+#pragma GCC diagnostic pop
 
             OT_ASSERT(inserted);
         }
