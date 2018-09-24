@@ -22,7 +22,10 @@
 
 #if OT_CASH_USING_LUCRE
 // IWYU pragma: begin_exports
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #include <lucre/bank.h>
+#pragma GCC diagnostic pop
 // IWYU pragma: end_exports
 #endif
 
