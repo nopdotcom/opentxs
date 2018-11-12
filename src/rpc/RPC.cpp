@@ -1429,8 +1429,19 @@ proto::RPCResponse RPC::list_accounts(const proto::RPCCommand& command) const
 
     auto& session = get_session(command.session());
 
+    const bool checkLabel = 0 != command.identifier_size();
+
     const auto& list = session.Storage().AccountList();
-    for (const auto& account : list) { output.add_identifier(account.first); }
+    for (const auto& account : list) {
+        if (checkLabel) {
+            const auto accountid = Identifier::Factory(id);
+            const auto label = session.Storage().AccountAlias(accountid);
+            if (0 != label::compare(command.identifier(0))) {
+                continue;
+            }
+        } 
+        output.add_identifier(account.first); 
+    }
 
     if (0 == output.identifier_size()) {
         add_output_status(output, proto::RPCRESPONSE_NONE);
