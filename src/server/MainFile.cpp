@@ -250,16 +250,17 @@ bool MainFile::CreateMainFile(
 
     auto loaded = server_.LoadServerNym(Identifier::Factory(strNymID));
     if (false == loaded) {
-        otOut << __FUNCTION__ << ": Error loading server nym.\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Error loading server nym.")
+            .Flush();
     } else {
-        otOut << __FUNCTION__
-              << ": OKAY, we have apparently created the new "
-                 "server.\n"
-                 "Let's try to load up your new server contract...\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": OKAY, we have apparently created the new "
+            "server. "
+            "Let's try to load up your new server contract...")
+            .Flush();
 
         return true;
     }
-
     return false;
 }
 
@@ -336,13 +337,17 @@ bool MainFile::LoadMainFile(bool bReadOnly)
                             xml->getAttributeValue("transactionNum"));
                         server_.GetTransactor().transactionNumber(
                             strTransactionNumber->ToLong());
-                        otOut << "\nLoading Open Transactions server. "
-                              << "File version: " << version_
-                              << "\nLast Issued Transaction Number: "
-                              << server_.GetTransactor().transactionNumber()
-                              << "\nNotary ID:     "
-                              << server_.GetServerID().str()
-                              << "\nServer Nym ID: " << server_.ServerNymID();
+                        {
+                            LogNormal(OT_METHOD)(__FUNCTION__)(
+                                ": Loading Open Transactions server. "
+                                "File version: ")(version_)(
+                                "Last Issued Transaction Number: ")(
+                                server_.GetTransactor().transactionNumber())(
+                                "Notary ID: ")(server_.GetServerID().str())(
+                                "Server Nym ID: ")(server_.ServerNymID())(".")
+                                .Flush();
+                        }
+
                     } else if (strNodeName->Compare("cachedKey")) {
                         auto ascCachedKey = Armored::Factory();
 
@@ -362,9 +367,13 @@ bool MainFile::LoadMainFile(bool bReadOnly)
                                     true);
                             }
                         }
+                        {
+                            LogNormal(OT_METHOD)(__FUNCTION__)(
+                                ": Loading cachedKey: ")(ascCachedKey->Get())(
+                                ".")
+                                .Flush();
+                        }
 
-                        otOut << "\nLoading cachedKey:\n"
-                              << ascCachedKey->Get() << "\n";
                     }
                     // the voucher reserve account IDs.
                     else if (strNodeName->Compare("accountList")) {
@@ -395,11 +404,13 @@ bool MainFile::LoadMainFile(bool bReadOnly)
                                 BASKET_ID,
                                 BASKET_ACCT_ID,
                                 BASKET_CONTRACT_ID)) {
-                            otOut << "Loading basket currency info...\n "
-                                  << "Basket ID: " << strBasketID
-                                  << "\n Basket Acct ID: " << strBasketAcctID
-                                  << "\n Basket Contract ID: "
-                                  << strBasketContractID << "\n";
+                            LogNormal(OT_METHOD)(__FUNCTION__)(
+                                ": Loading basket currency info... "
+                                "Basket ID: ")(strBasketID)(
+                                " Basket Acct ID: ")(strBasketAcctID)(
+                                " Basket Contract ID: ")(strBasketContractID)(
+                                ".")
+                                .Flush();
                         } else {
                             otErr << "Error adding basket currency info...\n "
                                      "Basket ID: "
@@ -454,7 +465,6 @@ bool MainFile::LoadMainFile(bool bReadOnly)
 
 bool MainFile::LoadServerUserAndContract()
 {
-    const char* szFunc = "MainFile::LoadServerUserAndContract";
     bool bSuccess = false;
     auto& serverNym = server_.m_nymServer;
 
@@ -487,21 +497,26 @@ bool MainFile::LoadServerUserAndContract()
     server_.Cron().SetNotaryID(NOTARY_ID);
     server_.Cron().SetServerNym(serverNym);
 
-    if (!server_.Cron().LoadCron())
-        otErr << szFunc
+    if (!server_.Cron().LoadCron()) {
+        otErr << __FUNCTION__
               << ": Failed loading Cron file. (Did you just create this "
                  "server?)\n";
-    otOut << szFunc << ": Loading the server contract...\n";
+    }
+    LogNormal(OT_METHOD)(__FUNCTION__)(": Loading the server contract...")
+        .Flush();
     auto pContract = server_.API().Wallet().Server(NOTARY_ID);
 
     if (pContract) {
-        otOut << "\n** Main Server Contract Verified **\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": ** Main Server Contract Verified **")
+            .Flush();
         bSuccess = true;
     } else {
-        otOut << "\n" << szFunc << ": Failed reading Main Server Contract:\n\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Failed reading Main Server Contract: ")
+            .Flush();
     }
 
     return bSuccess;
 }
-
 }  // namespace opentxs::server

@@ -99,6 +99,8 @@ Wallet::Wallet(const api::Core& core)
     , issuer_publisher_(api_.ZeroMQ().PublishSocket())
     , nym_publisher_(api_.ZeroMQ().PublishSocket())
     , server_publisher_(api_.ZeroMQ().PublishSocket())
+    , peer_reply_publisher_(api_.ZeroMQ().PublishSocket())
+    , peer_request_publisher_(api_.ZeroMQ().PublishSocket())
     , dht_nym_requester_{api_.ZeroMQ().RequestSocket()}
     , dht_server_requester_{api_.ZeroMQ().RequestSocket()}
     , dht_unit_requester_{api_.ZeroMQ().RequestSocket()}
@@ -107,6 +109,8 @@ Wallet::Wallet(const api::Core& core)
     issuer_publisher_->Start(api_.Endpoints().IssuerUpdate());
     nym_publisher_->Start(api_.Endpoints().NymDownload());
     server_publisher_->Start(api_.Endpoints().ServerUpdate());
+    peer_reply_publisher_->Start(api_.Endpoints().PeerReplyUpdate());
+    peer_request_publisher_->Start(api_.Endpoints().PeerRequestUpdate());
     dht_nym_requester_->Start(api_.Endpoints().DhtRequestNym());
     dht_server_requester_->Start(api_.Endpoints().DhtRequestServer());
     dht_unit_requester_->Start(api_.Endpoints().DhtRequestUnit());
@@ -1445,7 +1449,9 @@ bool Wallet::PeerReplyReceive(const Identifier& nym, const PeerObject& reply)
     const bool receivedReply = api_.Storage().Store(
         reply.Reply()->Contract(), nymID, StorageBox::INCOMINGPEERREPLY);
 
-    if (!receivedReply) {
+    if (receivedReply) {
+        peer_reply_publisher_->Publish(reply.Reply()->ID());
+    } else {
         otErr << OT_METHOD << __FUNCTION__ << ": failed to save incoming reply."
               << std::endl;
 
@@ -1465,7 +1471,7 @@ bool Wallet::PeerReplyReceive(const Identifier& nym, const PeerObject& reply)
     const bool removedRequest = api_.Storage().RemoveNymBoxItem(
         nymID, StorageBox::SENTPEERREQUEST, requestID->str());
 
-    if (!finishedRequest) {
+    if (!removedRequest) {
         otErr << OT_METHOD << __FUNCTION__
               << ": Failed to delete finished request from sent box."
               << std::endl;
@@ -1627,8 +1633,12 @@ bool Wallet::PeerRequestReceive(
     const std::string nymID = nym.str();
     Lock lock(peer_lock(nymID));
 
-    return api_.Storage().Store(
+    const auto saved = api_.Storage().Store(
         request.Request()->Contract(), nymID, StorageBox::INCOMINGPEERREQUEST);
+
+    if (saved) { peer_request_publisher_->Publish(request.Request()->ID()); }
+
+    return saved;
 }
 
 bool Wallet::PeerRequestUpdate(

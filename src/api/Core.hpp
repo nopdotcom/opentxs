@@ -22,14 +22,6 @@ public:
     const api::Endpoints& Endpoints() const override;
     const api::Factory& Factory() const override;
     int Instance() const override { return instance_; }
-    void Schedule(
-        const std::chrono::seconds& interval,
-        const PeriodicTask& task,
-        const std::chrono::seconds& last =
-            std::chrono::seconds(0)) const override
-    {
-        Scheduler::Schedule(interval, task, last);
-    }
 #if OT_CRYPTO_WITH_BIP39
     const api::HDSeed& Seeds() const override;
 #endif
@@ -56,7 +48,8 @@ protected:
     void cleanup();
 
     Core(
-        const Flag& running,
+        const api::Native& parent,
+        Flag& running,
         const ArgList& args,
         const api::Crypto& crypto,
         const api::Settings& config,

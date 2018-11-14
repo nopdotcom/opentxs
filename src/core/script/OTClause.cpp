@@ -27,6 +27,8 @@
 // directly
 // to said agent.)
 
+#define OT_METHOD "opentxs::OTClause::"
+
 namespace opentxs
 {
 
@@ -88,15 +90,17 @@ void OTClause::Serialize(Tag& parent) const
 bool OTClause::Compare(const OTClause& rhs) const
 {
     if (!(GetName().Compare(rhs.GetName()))) {
-        otOut << "OTClause::Compare: Names don't match: " << GetName() << " / "
-              << rhs.GetName() << " \n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Names don't match: ")(GetName())(
+            " / ")(rhs.GetName())(".")
+            .Flush();
         return false;
     }
 
     if (!(m_strCode->Compare(rhs.GetCode()))) {
-        otOut << "OTClause::Compare: Source code for interpreted script fails "
-                 "to match, on clause: "
-              << GetName() << " \n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Source code for interpreted script fails "
+            "to match, on clause: ")(GetName())(".")
+            .Flush();
         return false;
     }
 

@@ -28,6 +28,7 @@ public:
         const std::string& function);
 
     const LogSource& operator()(const char* in) const;
+    const LogSource& operator()(char* in) const;
     const LogSource& operator()(const std::string& in) const;
     const LogSource& operator()(const OTString& in) const;
     const LogSource& operator()(const OTStringXML& in) const;

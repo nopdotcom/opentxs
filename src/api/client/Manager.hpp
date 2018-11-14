@@ -65,7 +65,8 @@ private:
     void Init();
 
     Manager(
-        const Flag& running,
+        const api::Native& parent,
+        Flag& running,
         const ArgList& args,
         const api::Settings& config,
         const api::Crypto& crypto,

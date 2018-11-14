@@ -32,6 +32,12 @@ LogSource::LogSource(const int logLevel)
 {
 }
 
+const LogSource& LogSource::operator()(char* in) const
+{
+
+    return operator()(std::string(in));
+}
+
 const LogSource& LogSource::operator()(const char* in) const
 {
     if (verbosity_.load() < level_) { return *this; }

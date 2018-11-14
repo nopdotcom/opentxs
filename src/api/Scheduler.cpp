@@ -7,6 +7,7 @@
 
 #include "opentxs/api/network/Dht.hpp"
 #include "opentxs/api/storage/Storage.hpp"
+#include "opentxs/api/Periodic.hpp"
 #include "opentxs/core/Flag.hpp"
 #include "opentxs/core/Nym.hpp"
 
@@ -20,29 +21,18 @@
 
 namespace opentxs::api::implementation
 {
-Scheduler::Scheduler(const Flag& running)
+Scheduler::Scheduler(const api::Native& parent, Flag& running)
     : Lockable()
-    , nym_publish_interval_{std::numeric_limits<std::int64_t>::max()}
-    , nym_refresh_interval_{std::numeric_limits<std::int64_t>::max()}
-    , server_publish_interval_{std::numeric_limits<std::int64_t>::max()}
-    , server_refresh_interval_{std::numeric_limits<std::int64_t>::max()}
-    , unit_publish_interval_{std::numeric_limits<std::int64_t>::max()}
-    , unit_refresh_interval_{std::numeric_limits<std::int64_t>::max()}
-    , running_p_{Flag::Factory(running)}
-    , running_{running_p_.get()}
-    , periodic_task_list_{}
-    , periodic_{nullptr}
+    , nym_publish_interval_(std::numeric_limits<std::int64_t>::max())
+    , nym_refresh_interval_(std::numeric_limits<std::int64_t>::max())
+    , server_publish_interval_(std::numeric_limits<std::int64_t>::max())
+    , server_refresh_interval_(std::numeric_limits<std::int64_t>::max())
+    , unit_publish_interval_(std::numeric_limits<std::int64_t>::max())
+    , unit_refresh_interval_(std::numeric_limits<std::int64_t>::max())
+    , parent_(parent)
+    , running_(running)
+    , periodic_()
 {
-}
-
-void Scheduler::Schedule(
-    const std::chrono::seconds& interval,
-    const PeriodicTask& task,
-    const std::chrono::seconds& last) const
-{
-    Lock lock(lock_);
-    periodic_task_list_.push_back(
-        TaskItem{last.count(), interval.count(), task});
 }
 
 void Scheduler::Start(
@@ -120,35 +110,20 @@ void Scheduler::Start(
         },
         (now - std::chrono::seconds(unit_refresh_interval_) / 2));
 
-    periodic_.reset(new std::thread(&Scheduler::thread, this));
+    periodic_ = std::thread(&Scheduler::thread, this);
 }
 
 void Scheduler::thread()
 {
     while (running_) {
-        std::time_t now = std::time(nullptr);
-
-        Lock lock(lock_);
-
-        for (auto& [last, interval, task] : periodic_task_list_) {
-            if ((now - last) > interval) {
-                last = now;
-                std::thread taskThread{task};
-                taskThread.detach();
-            }
-        }
-
-        lock.unlock();
-
         // Storage has its own interval checking.
         storage_gc_hook();
-
         Log::Sleep(std::chrono::milliseconds(100));
     }
 }
 
 Scheduler::~Scheduler()
 {
-    if (periodic_) { periodic_->join(); }
+    if (periodic_.joinable()) { periodic_.join(); }
 }
 }  // namespace opentxs::api::implementation

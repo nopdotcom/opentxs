@@ -171,6 +171,30 @@ public:
      */
     EXPORT virtual std::string PairEvent() const = 0;
 
+    /** Peer reply event notification
+     *
+     *  A subscribe socket can connect to this endpoint to be notified when
+     *  any peer reply is received.
+     *
+     *  Messages bodies consist of one frame.
+     *   * The frame contains a serialized proto::PeerReply message
+     *
+     *  This endpoint is active for client sessions only.
+     */
+    EXPORT virtual std::string PeerReplyUpdate() const = 0;
+
+    /** Peer request event notification
+     *
+     *  A subscribe socket can connect to this endpoint to be notified when
+     *  any peer request is received.
+     *
+     *  Messages bodies consist of one frame.
+     *   * The frame contains a serialized proto::PeerRequest message
+     *
+     *  This endpoint is active for client sessions only.
+     */
+    EXPORT virtual std::string PeerRequestUpdate() const = 0;
+
     /** Pending bailment notification
      *
      *  A subscribe socket can connect to this endpoint to be notified when

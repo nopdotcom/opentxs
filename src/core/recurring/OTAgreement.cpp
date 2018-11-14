@@ -715,32 +715,30 @@ bool OTAgreement::CanRemoveItemFromCron(const ClientContext& context)
     // sender -- in a payment plan.) We check such things HERE in this function
     // (see below.)
     if (!context.RemoteNym().CompareID(GetRecipientNymID())) {
-        otOut << "OTAgreement::" << __FUNCTION__ << "\n Context Remote Nym ID: "
-              << String::Factory(context.RemoteNym().ID()) << "\n"
-              << "\n Sender Nym ID: " << String::Factory(GetSenderNymID())
-              << "\n"
-              << "\n Recipient Nym ID: " << String::Factory(GetRecipientNymID())
-              << "\n"
-              << " Weird: Nym tried to remove agreement (payment plan), even "
-                 "though he apparently wasn't the sender OR recipient.\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Context Remote Nym ID: ")(
+            (context.RemoteNym().ID()))(". Sender Nym ID: ")(
+            (GetSenderNymID()))(". Recipient Nym ID: ")((GetRecipientNymID()))(
+            ". Weird: Nym tried to remove agreement (payment plan), even "
+            "though he apparently wasn't the sender OR recipient.")
+            .Flush();
 
         return false;
     } else if (GetRecipientCountClosingNumbers() < 2) {
-        otOut << "OTAgreement::" << __FUNCTION__
-              << ": Weird: Recipient tried to remove agreement "
-                 "(or payment plan); expected 2 closing numbers to be "
-                 "available--that weren't."
-                 " (Found "
-              << GetRecipientCountClosingNumbers() << ").\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Weird: Recipient tried to remove agreement "
+            "(or payment plan); expected 2 closing numbers to be "
+            "available--that weren't."
+            " (Found ")(GetRecipientCountClosingNumbers())(").")
+            .Flush();
 
         return false;
     }
 
     if (!context.VerifyIssuedNumber(GetRecipientClosingNum())) {
-        otOut << "OTAgreement::" << __FUNCTION__
-              << ": Recipient Closing "
-                 "number didn't verify (for "
-                 "removal from cron).\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Recipient Closing "
+                                           "number didn't verify (for "
+                                           "removal from cron).")
+            .Flush();
 
         return false;
     }
@@ -818,28 +816,33 @@ bool OTAgreement::SetProposal(
              Identifier::Factory(MERCHANT_ACCT.GetPurportedAccountID());
 
     if (GetRecipientNymID() != id_MERCHANT_NYM) {
-        otOut << __FUNCTION__
-              << ": Merchant has wrong NymID (should be same "
-                 "as RecipientNymID.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Merchant has wrong NymID (should be same "
+            "as RecipientNymID).")
+            .Flush();
         return false;
     } else if (GetRecipientAcctID() != id_MERCHANT_ACCT) {
-        otOut << __FUNCTION__
-              << ": Merchant has wrong AcctID (should be same "
-                 "as RecipientAcctID.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Merchant has wrong AcctID (should be same "
+            "as RecipientAcctID).")
+            .Flush();
         return false;
     } else if (!MERCHANT_ACCT.VerifyOwner(nym)) {
-        otOut << __FUNCTION__
-              << ": Failure: Merchant account is not owned by Merchant Nym.\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Failure: Merchant account is not "
+                                           "owned by Merchant Nym.")
+            .Flush();
         return false;
     } else if (GetRecipientNymID() == GetSenderNymID()) {
-        otOut << __FUNCTION__
-              << ": Failure: Sender and recipient have the same "
-                 "Nym ID (not allowed.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Failure: Sender and recipient have the same "
+            "Nym ID (not allowed).")
+            .Flush();
         return false;
     } else if (context.AvailableNumbers() < 2) {
-        otOut << __FUNCTION__
-              << ": Failure. You need at least 2 transaction "
-                 "numbers available to do this.\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Failure. You need at least 2 transaction "
+            "numbers available to do this.")
+            .Flush();
         return false;
     }
     // --------------------------------------
@@ -871,9 +874,10 @@ bool OTAgreement::SetProposal(
     } else if (OT_TIME_ZERO < VALID_TO)  // VALID_TO is ABOVE zero...
     {
         SetValidTo(OTTimeAddTimeInterval(
-            GetValidFrom(), OTTimeGetSecondsFromTime(VALID_TO)));  // Set it to
-                                                                   // itself +
-        // valid_from.
+            GetValidFrom(),
+            OTTimeGetSecondsFromTime(VALID_TO)));  // Set it to
+                                                   // itself +
+                                                   // valid_from.
     } else  // VALID_TO is a NEGATIVE number... Error.
     {
         std::int64_t lValidTo = OTTimeGetSecondsFromTime(VALID_TO);
@@ -955,47 +959,57 @@ bool OTAgreement::Confirm(
              Identifier::Factory(PAYER_ACCT.GetPurportedAccountID());
 
     if (GetRecipientNymID() == GetSenderNymID()) {
-        otOut << __FUNCTION__
-              << ": Error: Sender and recipient have the same "
-                 "Nym ID (not allowed.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Error: Sender and recipient have the same "
+            "Nym ID (not allowed).")
+            .Flush();
         return false;
     } else if (
         (!p_id_MERCHANT_NYM.empty()) &&
         (GetRecipientNymID() != p_id_MERCHANT_NYM)) {
-        otOut << __FUNCTION__
-              << ": Merchant has wrong NymID (should be same "
-                 "as RecipientNymID.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Merchant has wrong NymID (should be same "
+            "as RecipientNymID).")
+            .Flush();
         return false;
     } else if (
         (nullptr != pMERCHANT_NYM) &&
         (GetRecipientNymID() != pMERCHANT_NYM->ID())) {
-        otOut << __FUNCTION__
-              << ": Merchant has wrong NymID (should be same "
-                 "as RecipientNymID.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Merchant has wrong NymID (should be same "
+            "as RecipientNymID).")
+            .Flush();
         return false;
     } else if (GetSenderNymID() != id_PAYER_NYM) {
-        otOut << __FUNCTION__
-              << ": Payer has wrong NymID (should be same as SenderNymID.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Payer has wrong NymID (should be same"
+            " as SenderNymID).")
+            .Flush();
         return false;
     } else if (
         !GetSenderAcctID().empty() && (GetSenderAcctID() != id_PAYER_ACCT)) {
-        otOut << __FUNCTION__
-              << ": Payer has wrong AcctID (should be same as SenderAcctID.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Payer has wrong AcctID (should be same "
+            "as SenderAcctID).")
+            .Flush();
         return false;
     } else if (!PAYER_ACCT.VerifyOwner(*nym)) {
-        otOut << __FUNCTION__
-              << ": Failure: Payer (customer) account is not owned by Payer Nym"
-              << std::endl;
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Failure: Payer (customer) account is not "
+            "owned by Payer Nym.")
+            .Flush();
         return false;
     } else if (context.AvailableNumbers() < 2) {
-        otOut << __FUNCTION__
-              << ": Failure. You need at least 2 transaction "
-                 "numbers available to do this.\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Failure. You need at least 2 transaction "
+            "numbers available to do this.")
+            .Flush();
         return false;
     } else if (GetRecipientCountClosingNumbers() < 2) {
-        otOut << __FUNCTION__
-              << ": Failure. (The merchant was supposed to "
-                 "attach 2 transaction numbers.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Failure. (The merchant was supposed to "
+            "attach 2 transaction numbers).")
+            .Flush();
         return false;
     }
 
@@ -1004,7 +1018,9 @@ bool OTAgreement::Confirm(
     //
     if ((nullptr != pMERCHANT_NYM) &&
         (false == VerifySignature(*pMERCHANT_NYM))) {
-        otOut << __FUNCTION__ << ": Merchant's signature failed to verify.\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Merchant's signature failed to verify.")
+            .Flush();
         return false;
     }
 

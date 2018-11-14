@@ -3531,10 +3531,10 @@ bool OpenSSL::DecryptSessionKey(
     if (!bFoundKeyAlready)  // Todo: AND if list of POTENTIAL matches is
                             // also empty...
     {
-        otOut << __FUNCTION__
-              << ": Sorry: Unable to find a session key for the Nym attempting "
-                 "to open this envelope: "
-              << strNymID << "\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ":  Sorry: Unable to find a session key for the Nym attempting "
+            "to open this envelope: ")(strNymID)(".")
+            .Flush();
         return false;
     }
 

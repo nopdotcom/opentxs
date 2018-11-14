@@ -10,6 +10,7 @@
 
 #include "opentxs/Forward.hpp"
 
+#include "opentxs/api/Periodic.hpp"
 #include "opentxs/Proto.hpp"
 #include "opentxs/Types.hpp"
 
@@ -21,7 +22,7 @@ namespace opentxs
 {
 namespace api
 {
-class Native
+class Native : virtual public Periodic
 {
 public:
     using ShutdownCallback = std::function<void()>;

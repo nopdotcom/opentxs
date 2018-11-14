@@ -27,6 +27,7 @@
 #define SERVER_WALLET_FILENAME "notaryServer.xml"
 #define SERVER_MASTER_KEY_TIMEOUT_DEFAULT -1
 #define SERVER_USE_SYSTEM_KEYRING false
+#define OT_METHOD "opentxs::Configloader::"
 
 namespace opentxs::server
 {
@@ -56,7 +57,10 @@ bool ConfigLoader::load(
             strValue,
             bIsNewKey);
         walletFilename.Set(strValue);
-        otOut << "Using Wallet: " << strValue << "\n";
+        {
+            LogNormal(OT_METHOD)(__FUNCTION__)(":Using Wallet: ")(strValue)(".")
+                .Flush();
+        }
     }
 
     // CRON
@@ -285,7 +289,11 @@ bool ConfigLoader::load(
                 "security", "password_folder", "", strValue, bIsNewKey2);
             if (strValue.Exists()) {
                 OTKeyring::FlatFile_SetPasswordFolder(strValue.Get());
-                otOut << " Using server password folder: " << strValue << "\n";
+                {
+                    LogNormal(OT_METHOD)(__FUNCTION__)(
+                        ": Using server password folder: ")(stringvalue)(".")
+                        .Flush();
+                }
             }
         }
 #endif

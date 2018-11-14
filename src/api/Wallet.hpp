@@ -244,6 +244,8 @@ private:
     OTZMQPublishSocket issuer_publisher_;
     OTZMQPublishSocket nym_publisher_;
     OTZMQPublishSocket server_publisher_;
+    OTZMQPublishSocket peer_reply_publisher_;
+    OTZMQPublishSocket peer_request_publisher_;
     OTZMQRequestSocket dht_nym_requester_;
     OTZMQRequestSocket dht_server_requester_;
     OTZMQRequestSocket dht_unit_requester_;

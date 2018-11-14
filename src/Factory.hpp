@@ -70,7 +70,8 @@ public:
         const api::client::Manager& api,
         const api::client::ServerAction& serverAction);
     static api::client::internal::Manager* ClientManager(
-        const Flag& running,
+        const api::Native& parent,
+        Flag& running,
         const ArgList& args,
         const api::Settings& config,
         const api::Crypto& crypto,
@@ -275,7 +276,8 @@ public:
         const api::client::Manager& api,
         const ContextLockCallback& lockCallback);
     static api::server::Manager* ServerManager(
-        const Flag& running,
+        const api::Native& parent,
+        Flag& running,
         const ArgList& args,
         const api::Crypto& crypto,
         const api::Settings& config,

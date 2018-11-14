@@ -56,6 +56,7 @@
 #include "internal/rpc/Internal.hpp"
 #include "network/OpenDHT.hpp"
 #include "storage/StorageConfig.hpp"
+#include "Periodic.hpp"
 #include "Scheduler.hpp"
 
 #include <algorithm>
@@ -337,7 +338,9 @@ Native::Native(
     const ArgList& args,
     const std::chrono::seconds gcInterval,
     OTCaller* externalPasswordCallback)
-    : running_(running)
+    : api::internal::Native()
+    , Lockable()
+    , Periodic(running)
     , gc_interval_(gcInterval)
     , config_lock_()
     , task_list_lock_()
@@ -637,6 +640,7 @@ void Native::start_client(const Lock& lock, const ArgList& args) const
     const int next = client_.size();
     const auto instance = client_instance(next);
     client_.emplace_back(opentxs::Factory::ClientManager(
+        *this,
         running_,
         merged_args,
         Config(legacy_->ClientConfigFilePath(next)),
@@ -677,6 +681,7 @@ void Native::start_server(const Lock& lock, const ArgList& args) const
     const auto next{server_.size()};
     const auto instance{server_instance(next)};
     server_.emplace_back(opentxs::Factory::ServerManager(
+        *this,
         running_,
         merged_args,
         *crypto_,

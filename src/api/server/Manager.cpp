@@ -56,7 +56,8 @@
 namespace opentxs
 {
 api::server::Manager* Factory::ServerManager(
-    const Flag& running,
+    const api::Native& parent,
+    Flag& running,
     const ArgList& args,
     const api::Crypto& crypto,
     const api::Settings& config,
@@ -66,7 +67,14 @@ api::server::Manager* Factory::ServerManager(
 {
     api::server::implementation::Manager* manager =
         new api::server::implementation::Manager(
-            running, args, crypto, config, context, dataFolder, instance);
+            parent,
+            running,
+            args,
+            crypto,
+            config,
+            context,
+            dataFolder,
+            instance);
     if (nullptr != manager) {
         try {
             manager->Init();
@@ -96,14 +104,24 @@ api::server::Manager* Factory::ServerManager(
 namespace opentxs::api::server::implementation
 {
 Manager::Manager(
-    const Flag& running,
+    const api::Native& parent,
+    Flag& running,
     const ArgList& args,
     const api::Crypto& crypto,
     const api::Settings& config,
     const opentxs::network::zeromq::Context& context,
     const std::string& dataFolder,
     const int instance)
-    : Core(running, args, crypto, config, context, dataFolder, instance, true)
+    : Core(
+          parent,
+          running,
+          args,
+          crypto,
+          config,
+          context,
+          dataFolder,
+          instance,
+          true)
     , server_p_(new opentxs::server::Server(*this))
     , server_(*server_p_)
     , message_processor_p_(

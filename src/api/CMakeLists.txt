@@ -20,6 +20,7 @@ set(cxx-sources
   Legacy.cpp
   Log.cpp
   Native.cpp
+  Periodic.cpp
   Scheduler.cpp
   Settings.cpp
   StorageParent.cpp
@@ -41,6 +42,7 @@ set(cxx-headers
   ${CMAKE_CURRENT_SOURCE_DIR}/Legacy.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Log.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Native.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Periodic.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Scheduler.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Settings.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/StorageParent.hpp

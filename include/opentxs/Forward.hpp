@@ -67,6 +67,7 @@ class HDSeed;
 class Identity;
 class Legacy;
 class Native;
+class Periodic;
 class Settings;
 class Wallet;
 }  // namespace api

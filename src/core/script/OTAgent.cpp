@@ -541,10 +541,10 @@ bool OTAgent::VerifyAgencyOfAccount(const Account& theAccount) const
 
     return theAccount.VerifyOwnerByID(theSignerID);  // todo when entities and
                                                      // roles come, won't this
-    // "just work", or do I also
-    // have to warn the acct
-    // whether it's a Nym or a
-    // Role being passed?
+                                                     // "just work", or do I
+                                                     // also have to warn the
+                                                     // acct whether it's a Nym
+                                                     // or a Role being passed?
 }
 
 bool OTAgent::DropFinalReceiptToInbox(
@@ -892,10 +892,12 @@ bool OTAgent::ReserveClosingTransNum(
 {
     if (IsAnIndividual() && DoesRepresentHimself() && (nullptr != m_pNym)) {
         if (thePartyAcct.GetClosingTransNo() > 0) {
-            otOut << "OTAgent::ReserveClosingTransNum: Failure: The account "
-                     "ALREADY has a closing transaction number "
-                     "set on it. Don't you want to save that first, before "
-                     "overwriting it?\n";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ": Failure: The account "
+                "ALREADY has a closing transaction number "
+                "set on it. Don't you want to save that first, before "
+                "overwriting it?")
+                .Flush();
 
             return false;
         }
@@ -951,10 +953,12 @@ bool OTAgent::ReserveOpeningTransNum(ServerContext& context)
         }
 
         if (m_pForParty->GetOpeningTransNo() > 0) {
-            otOut << "OTAgent::ReserveOpeningTransNum: Failure: Party ALREADY "
-                     "had an opening transaction number "
-                     "set on it. Don't you want to save that first, before "
-                     "overwriting it?\n";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ": Failure: Party ALREADY "
+                "had an opening transaction number "
+                "set on it. Don't you want to save that first, before "
+                "overwriting it?")
+                .Flush();
             return false;
         }
 

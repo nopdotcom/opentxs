@@ -101,7 +101,8 @@ private:
     void Start() override;
 
     Manager(
-        const Flag& running,
+        const api::Native& parent,
+        Flag& running,
         const ArgList& args,
         const api::Crypto& crypto,
         const api::Settings& config,

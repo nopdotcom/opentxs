@@ -7,6 +7,7 @@
 
 #include "Internal.hpp"
 
+#include "opentxs/api/Native.hpp"
 #include "opentxs/core/util/Common.hpp"
 #include "opentxs/core/Lockable.hpp"
 
@@ -18,13 +19,22 @@
 
 namespace opentxs::api::implementation
 {
-class Scheduler : public Lockable
+class Scheduler : virtual public api::Periodic, public Lockable
 {
 public:
-    void Schedule(
+    bool Cancel(const int task) const override { return parent_.Cancel(task); }
+    bool Reschedule(const int task, const std::chrono::seconds& interval)
+        const override
+    {
+        return parent_.Reschedule(task, interval);
+    }
+    int Schedule(
         const std::chrono::seconds& interval,
         const PeriodicTask& task,
-        const std::chrono::seconds& last) const;
+        const std::chrono::seconds& last) const override
+    {
+        return parent_.Schedule(interval, task, last);
+    }
 
     virtual ~Scheduler();
 
@@ -35,22 +45,17 @@ protected:
     std::int64_t server_refresh_interval_{0};
     std::int64_t unit_publish_interval_{0};
     std::int64_t unit_refresh_interval_{0};
-    OTFlag running_p_;
+    const api::Native& parent_;
     Flag& running_;
 
     void Start(
         const api::storage::Storage* const storage,
         const api::network::Dht* const dht);
 
-    Scheduler(const Flag& running);
+    Scheduler(const api::Native& parent, Flag& running);
 
 private:
-    /** Last performed, Interval, Task */
-    using TaskItem = std::tuple<time64_t, time64_t, PeriodicTask>;
-    using TaskList = std::list<TaskItem>;
-
-    mutable TaskList periodic_task_list_;
-    std::unique_ptr<std::thread> periodic_;
+    std::thread periodic_;
 
     virtual void storage_gc_hook() = 0;
 

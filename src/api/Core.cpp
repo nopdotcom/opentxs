@@ -24,7 +24,8 @@
 namespace opentxs::api::implementation
 {
 Core::Core(
-    const Flag& running,
+    const api::Native& parent,
+    Flag& running,
     const ArgList& args,
     const api::Crypto& crypto,
     const api::Settings& config,
@@ -33,7 +34,7 @@ Core::Core(
     const int instance,
     const bool dhtDefault)
     : StorageParent(running, args, crypto, config, dataFolder)
-    , Scheduler(running)
+    , Scheduler(parent, running)
     , zmq_context_(zmq)
     , instance_(instance)
     , endpoints_(opentxs::Factory::Endpoints(zmq_context_, instance_))

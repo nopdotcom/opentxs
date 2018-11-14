@@ -27,13 +27,15 @@ namespace server
 
 #define OT_ENFORCE_PERMISSION_MSG(BOOL_VAR_NAME)                               \
     {                                                                          \
-        const char* pNymAllowedIDStr = msgIn.m_strNymID->Get();                 \
-        const char* pActionNameStr = msgIn.m_strCommand->Get();                 \
+        const char* pNymAllowedIDStr = msgIn.m_strNymID->Get();                \
+        const char* pActionNameStr = msgIn.m_strCommand->Get();                \
                                                                                \
         if (false == NYM_IS_ALLOWED(pNymAllowedIDStr, BOOL_VAR_NAME)) {        \
-            otOut << "Nym " << pNymAllowedIDStr << " attempted an action ("    \
-                  << pActionNameStr << "), but based on server configuration," \
-                  << " he's not allowed.\n";                                   \
+            LogNormal(OT_METHOD)(__FUNCTION__)(": Nym ")(pNymAllowedIDStr)(    \
+                " attempted an action (")(pActionNameStr)(                     \
+                "), but based on server configuration,"                        \
+                " he's not allowed.")                                          \
+                .Flush();                                                      \
             return false;                                                      \
         }                                                                      \
     }

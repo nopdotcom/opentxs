@@ -38,6 +38,7 @@
 #include <opentxs/api/HDSeed.hpp>
 #include <opentxs/api/Legacy.hpp>
 #include <opentxs/api/Native.hpp>
+#include <opentxs/api/Periodic.hpp>
 #include <opentxs/api/Wallet.hpp>
 #if OT_CASH
 #include <opentxs/cash/Purse.hpp>

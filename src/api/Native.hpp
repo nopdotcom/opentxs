@@ -18,7 +18,7 @@ namespace opentxs::api::implementation
 /** \brief Singlton class for providing an interface to process-level resources.
  *  \ingroup native
  */
-class Native final : api::internal::Native, Lockable
+class Native final : api::internal::Native, Lockable, Periodic
 {
 public:
     const api::client::Manager& Client(const int instance) const override;
@@ -51,7 +51,6 @@ private:
 
     typedef std::map<std::string, std::unique_ptr<api::Settings>> ConfigMap;
 
-    Flag& running_;
     const std::chrono::seconds gc_interval_{0};
     OTPassword word_list_{};
     OTPassword passphrase_{};

@@ -28,6 +28,8 @@
 #include <string>
 #include <utility>
 
+#define OT_METHOD "opentxs::OTStash"
+
 namespace opentxs
 {
 
@@ -81,8 +83,9 @@ std::int32_t OTStash::ReadFromXMLNode(
         while (nCount-- > 0) {
             //            xml->read();
             if (!Contract::SkipToElement(xml)) {
-                otOut << "OTStash::ReadFromXMLNode: Failure: Unable to find "
-                         "expected element.\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(": Failure: Unable to find "
+                                                   "expected element.")
+                    .Flush();
                 return (-1);
             }
 
@@ -127,9 +130,10 @@ std::int32_t OTStash::ReadFromXMLNode(
 
     if (!Contract::SkipAfterLoadingField(xml))  // </stash>
     {
-        otOut << "*** OTStash::ReadFromXMLNode: Bad data? Expected "
-                 "EXN_ELEMENT_END here, but "
-                 "didn't get it. Returning -1.\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Bad data? Expected "
+                                           "EXN_ELEMENT_END here, but "
+                                           "didn't get it. Returning -1.")
+            .Flush();
         return (-1);
     }
 

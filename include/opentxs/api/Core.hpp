@@ -8,11 +8,13 @@
 
 #include "opentxs/Forward.hpp"
 
+#include "opentxs/api/Periodic.hpp"
+
 namespace opentxs
 {
 namespace api
 {
-class Core
+class Core : virtual public Periodic
 {
 public:
     EXPORT virtual const api::Settings& Config() const = 0;
@@ -22,12 +24,6 @@ public:
     EXPORT virtual const network::Dht& DHT() const = 0;
     EXPORT virtual const api::Factory& Factory() const = 0;
     EXPORT virtual int Instance() const = 0;
-    /** Adds a task to the periodic task list with the specified interval. By
-     * default, schedules for immediate execution. */
-    EXPORT virtual void Schedule(
-        const std::chrono::seconds& interval,
-        const opentxs::PeriodicTask& task,
-        const std::chrono::seconds& last = std::chrono::seconds(0)) const = 0;
 #if OT_CRYPTO_WITH_BIP39
     EXPORT virtual const api::HDSeed& Seeds() const = 0;
 #endif

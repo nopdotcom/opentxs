@@ -21,6 +21,8 @@ public:
     std::string IssuerUpdate() const override;
     std::string NymDownload() const override;
     std::string PairEvent() const override;
+    std::string PeerReplyUpdate() const override;
+    std::string PeerRequestUpdate() const override;
     std::string PendingBailment() const override;
     std::string ServerReplyReceived() const override;
     std::string ServerRequestSent() const override;

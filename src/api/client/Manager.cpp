@@ -47,7 +47,8 @@
 namespace opentxs
 {
 api::client::internal::Manager* Factory::ClientManager(
-    const Flag& running,
+    const api::Native& parent,
+    Flag& running,
     const ArgList& args,
     const api::Settings& config,
     const api::Crypto& crypto,
@@ -56,21 +57,31 @@ api::client::internal::Manager* Factory::ClientManager(
     const int instance)
 {
     return new api::client::implementation::Manager(
-        running, args, config, crypto, context, dataFolder, instance);
+        parent, running, args, config, crypto, context, dataFolder, instance);
 }
 }  // namespace opentxs
 
 namespace opentxs::api::client::implementation
 {
 Manager::Manager(
-    const Flag& running,
+    const api::Native& parent,
+    Flag& running,
     const ArgList& args,
     const api::Settings& config,
     const api::Crypto& crypto,
     const opentxs::network::zeromq::Context& context,
     const std::string& dataFolder,
     const int instance)
-    : Core(running, args, crypto, config, context, dataFolder, instance, false)
+    : Core(
+          parent,
+          running,
+          args,
+          crypto,
+          config,
+          context,
+          dataFolder,
+          instance,
+          false)
     , zeromq_(opentxs::Factory::ZMQ(*this, running_))
     , identity_(opentxs::Factory::Identity(*this))
     , contacts_(opentxs::Factory::Contacts(*this))

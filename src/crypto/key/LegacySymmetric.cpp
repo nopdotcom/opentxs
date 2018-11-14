@@ -367,9 +367,9 @@ OTPassword* LegacySymmetric::GetPassphraseFromUser(
     } else {
         delete pPassUserInput;
         pPassUserInput = nullptr;
-        otOut
-            << __FUNCTION__
-            << ": Sorry, unable to retrieve passphrase from user. (Failure.)\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Sorry, unable to retrieve "
+                                           "passphrase from user. (Failure).")
+            .Flush();
     }
 
     return nullptr;
@@ -738,9 +738,10 @@ OTPassword* LegacySymmetric::calculate_derived_key_from_passphrase(
         OT_ASSERT(false == tmpDataHashCheck->empty());
     } else {
         if (!HasHashCheck()) {
-            otOut << __FUNCTION__
-                  << ": Warning!! No hash check, ignoring... "
-                     "(since bCheckForHashCheck was set false)";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ": Warning!! No hash check, ignoring... "
+                "(since bCheckForHashCheck was set false).")
+                .Flush();
             OT_ASSERT(tmpDataHashCheck->empty());
         }
     }

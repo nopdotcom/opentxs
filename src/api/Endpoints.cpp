@@ -25,6 +25,8 @@
 #define ISSUER_UPDATE_ENDPOINT "issuerupdate"
 #define NYM_UPDATE_ENDPOINT "nymupdate"
 #define PAIR_EVENT_ENDPOINT "pairevent"
+#define PEER_REPLY_UPDATE_ENDPOINT "peerreplyupdate"
+#define PEER_REQUEST_UPDATE_ENDPOINT "peerrequestupdate"
 #define PENDING_BAILMENT_ENDPOINT "peerrequest/pendingbailment"
 #define SERVER_REPLY_RECEIVED_ENDPOINT "reply/received"
 #define SERVER_REQUEST_SENT_ENDPOINT "request/sent"
@@ -126,6 +128,16 @@ std::string Endpoints::NymDownload() const
 std::string Endpoints::PairEvent() const
 {
     return build_inproc_path(PAIR_EVENT_ENDPOINT, ENDPOINT_VERSION_1);
+}
+
+std::string Endpoints::PeerReplyUpdate() const
+{
+    return build_inproc_path(PEER_REPLY_UPDATE_ENDPOINT, ENDPOINT_VERSION_1);
+}
+
+std::string Endpoints::PeerRequestUpdate() const
+{
+    return build_inproc_path(PEER_REQUEST_UPDATE_ENDPOINT, ENDPOINT_VERSION_1);
 }
 
 std::string Endpoints::PendingBailment() const

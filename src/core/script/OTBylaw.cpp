@@ -25,6 +25,8 @@
 #include <string>
 #include <utility>
 
+#define OT_METHOD "opentxs::OTBylaw"
+
 namespace opentxs
 {
 
@@ -179,30 +181,31 @@ bool OTBylaw::Compare(OTBylaw& rhs)
     if ((m_strName->Compare(rhs.GetName())) &&
         (m_strLanguage->Compare(rhs.GetLanguage()))) {
         if (GetVariableCount() != rhs.GetVariableCount()) {
-            otOut << "OTBylaw::" << __FUNCTION__
-                  << ": The variable count doesn't match for "
-                     "bylaw: "
-                  << m_strName << "\n";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ": The variable count doesn't match for "
+                "bylaw: ")(m_strName)(".")
+                .Flush();
             return false;
         }
         if (GetClauseCount() != rhs.GetClauseCount()) {
-            otOut << "OTBylaw::" << __FUNCTION__
-                  << ": The clause count doesn't match for "
-                     "bylaw: "
-                  << m_strName << "\n";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ": The clause count doesn't match for "
+                "bylaw: ")(m_strName)(".")
+                .Flush();
             return false;
         }
         if (GetHookCount() != rhs.GetHookCount()) {
-            otOut << "OTBylaw::" << __FUNCTION__
-                  << ": The hook count doesn't match for bylaw: " << m_strName
-                  << "\n";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ": The hook count doesn't match for "
+                "bylaw: ")(m_strName)(".")
+                .Flush();
             return false;
         }
         if (GetCallbackCount() != rhs.GetCallbackCount()) {
-            otOut << "OTBylaw::" << __FUNCTION__
-                  << ": The callback count doesn't match for "
-                     "bylaw: "
-                  << m_strName << "\n";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ": The callback count doesn't match for "
+                "bylaw: ")(m_strName)(".")
+                .Flush();
             return false;
         }
         // THE COUNTS MATCH, Now let's look up each one by NAME and verify that
@@ -215,16 +218,16 @@ bool OTBylaw::Compare(OTBylaw& rhs)
             OTVariable* pVar2 = rhs.GetVariable(pVar->GetName().Get());
 
             if (nullptr == pVar2) {
-                otOut << "OTBylaw::" << __FUNCTION__
-                      << ": Failed: Variable not found: " << pVar->GetName()
-                      << ".\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(
+                    ": Failed: Variable not found: ")(pVar->GetName())(".")
+                    .Flush();
                 return false;
             }
             if (!pVar->Compare(*pVar2)) {
-                otOut << "OTBylaw::" << __FUNCTION__
-                      << ": Failed comparison between 2 "
-                         "variables named "
-                      << pVar->GetName() << ".\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(
+                    ": Failed comparison between 2 "
+                    "variables named ")(pVar->GetName())(".")
+                    .Flush();
                 return false;
             }
         }
@@ -236,16 +239,16 @@ bool OTBylaw::Compare(OTBylaw& rhs)
             OTClause* pClause2 = rhs.GetClause(pClause->GetName().Get());
 
             if (nullptr == pClause2) {
-                otOut << "OTBylaw::" << __FUNCTION__
-                      << ": Failed: Clause not found: " << pClause->GetName()
-                      << ".\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(
+                    ": Failed: Clause not found: ")(pClause->GetName())(".")
+                    .Flush();
                 return false;
             }
             if (!pClause->Compare(*pClause2)) {
-                otOut << "OTBylaw::" << __FUNCTION__
-                      << ": Failed comparison between 2 "
-                         "clauses named "
-                      << pClause->GetName() << ".\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(
+                    ": Failed comparison between 2 "
+                    "clauses named ")(pClause->GetName())(".")
+                    .Flush();
                 return false;
             }
         }
@@ -258,22 +261,25 @@ bool OTBylaw::Compare(OTBylaw& rhs)
             OTClause* pCallbackClause2 = rhs.GetCallback(str_callback_name);
 
             if (nullptr == pCallbackClause) {
-                otOut << "OTBylaw::" << __FUNCTION__ << ": Failed: Callback ("
-                      << str_callback_name << ") clause (" << str_clause_name
-                      << ") not found on this bylaw: " << m_strName << ".\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(":  Failed: Callback (")(
+                    str_callback_name)(") clause (")(str_clause_name)(
+                    ") not found on this bylaw: ")(m_strName)(".")
+                    .Flush();
                 return false;
             } else if (nullptr == pCallbackClause2) {
-                otOut << "OTBylaw::" << __FUNCTION__ << ": Failed: Callback ("
-                      << str_callback_name << ") clause (" << str_clause_name
-                      << ") not found on rhs bylaw: " << rhs.GetName() << ".\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(":  Failed: Callback (")(
+                    str_callback_name)(") clause (")(str_clause_name)(
+                    ") not found on rhs bylaw: ")(rhs.GetName())(".")
+                    .Flush();
                 return false;
             } else if (!(pCallbackClause->GetName().Compare(
                            pCallbackClause2->GetName()))) {
-                otOut << "OTBylaw::" << __FUNCTION__ << ": Failed: Callback ("
-                      << str_callback_name << ") clause (" << str_clause_name
-                      << ") on rhs has a different name ("
-                      << pCallbackClause2->GetName()
-                      << ") than *this bylaw: " << m_strName << ".\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(":  Failed: Callback (")(
+                    str_callback_name)(") clause (")(str_clause_name)(
+                    ") on rhs has a different name (")(
+                    pCallbackClause2->GetName())(") than *this bylaw: ")(
+                    m_strName)(".")
+                    .Flush();
                 return false;
             }
 
@@ -302,19 +308,18 @@ bool OTBylaw::Compare(OTBylaw& rhs)
 
             if (!GetHooks(str_hook_name, theHookClauses) ||
                 !rhs.GetHooks(str_hook_name, theHookClauses2)) {
-                otOut << "OTBylaw::" << __FUNCTION__
-                      << ": Failed finding hook (" << str_hook_name
-                      << ") clauses on this bylaw or rhs bylaw: " << m_strName
-                      << "\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(": Failed finding hook (")(
+                    str_hook_name)(") clauses on this bylaw or rhs bylaw: ")(
+                    m_strName)(".")
+                    .Flush();
                 return false;
             }
 
             if (theHookClauses.size() != theHookClauses2.size()) {
-                otOut << "OTBylaw::" << __FUNCTION__ << ": Hook ("
-                      << str_hook_name
-                      << ") clauses count doesn't match between this bylaw and "
-                         "the rhs bylaw named: "
-                      << m_strName << "\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(": Hook (")(str_hook_name)(
+                    ") clauses count doesn't match between this bylaw and "
+                    "the rhs bylaw named: ")(m_strName)(".")
+                    .Flush();
                 return false;
             }
 
@@ -326,11 +331,11 @@ bool OTBylaw::Compare(OTBylaw& rhs)
                 auto it_rhs = theHookClauses2.find(str_clause_name);
 
                 if (theHookClauses2.end() == it_rhs) {
-                    otOut << "OTBylaw::" << __FUNCTION__
-                          << ": Unable to find hook clause (" << str_clause_name
-                          << ") on rhs that was definitely present on *this. "
-                             "Bylaw: "
-                          << m_strName << "\n";
+                    LogNormal(OT_METHOD)(__FUNCTION__)(
+                        ": Unable to find hook clause (")(str_clause_name)(
+                        ") on rhs that was definitely present on "
+                        "*this. Bylaw: ")(m_strName)(".")
+                        .Flush();
                     return false;
                 }
 
@@ -387,9 +392,10 @@ OTClause* OTBylaw::GetCallback(std::string str_Name)
         {
             return pClause;
         } else {
-            otOut << "OTBylaw::" << __FUNCTION__ << ": Couldn't find clause ("
-                  << str_clause_name << ") that was registered for callback ("
-                  << str_Name << ")\n";
+            LogNormal(OT_METHOD)(__FUNCTION__)(": Couldn't find clause (")(
+                str_clause_name)(") that was registered for callback (")(
+                str_Name)(")")(".")
+                .Flush();
         }
     }
 
@@ -563,9 +569,10 @@ bool OTBylaw::AddCallback(
                                      // twice.)
     {
         const std::string str_existing_clause = it->second;
-        otOut << "OTBylaw::" << __FUNCTION__ << ": Failed to add callback ("
-              << str_CallbackName << ") to bylaw " << m_strName
-              << ", already there as " << str_existing_clause << ".\n";
+        LogNormal(OT_METHOD)(__FUNCTION__)(": Failed to add callback (")(
+            str_CallbackName)(") to bylaw ")(m_strName)(", already there as ")(
+            str_existing_clause)(".")
+            .Flush();
         return false;
     }
     // Below this point, we know the callback wasn't already there.
@@ -611,9 +618,10 @@ bool OTBylaw::AddHook(std::string str_HookName, std::string str_ClauseName)
 
         if ((0 == str_hook_name.compare(str_HookName)) &&
             (0 == str_clause_name.compare(str_ClauseName))) {
-            otOut << "OTBylaw::" << __FUNCTION__
-                  << ": Failed: Hook already exists: '" << str_HookName
-                  << "'. For clause name: '" << str_ClauseName << "'.";
+            LogNormal(OT_METHOD)(__FUNCTION__)(
+                ":  Failed: Hook already exists: ")(str_HookName)(
+                ". For clause name: ")(str_ClauseName)(".")
+                .Flush();
             return false;
         }
     }
@@ -775,9 +783,10 @@ bool OTBylaw::GetHooks(std::string str_HookName, mapOfClauses& theResults)
                                                 str_clause_name, pClause)))
                     bReturnVal = true;
             } else {
-                otOut << __FUNCTION__ << ": Couldn't find clause ("
-                      << str_clause_name << ") that was registered for hook ("
-                      << str_hook_name << ")\n";
+                LogNormal(OT_METHOD)(__FUNCTION__)(": Couldn't find clause (")(
+                    str_clause_name)(") that was registered for hook (")(
+                    str_hook_name)(")")(".")
+                    .Flush();
             }
         }
         // else no error, since it's normal for nothing to match.
@@ -812,13 +821,13 @@ bool OTBylaw::AddVariable(OTVariable& theVariable)
         theVariable.SetBylaw(*this);
 
         return true;
-    } else
-        otOut << "OTBylaw::" << __FUNCTION__
-              << ": Failed -- A variable was already there "
-                 "named: "
-              << str_name << "\n";
-
-    return false;
+    } else {
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ": Failed -- A variable was already there "
+            "named: ")(str_name)(".")
+            .Flush();
+        return false;
+    }
 }
 
 bool OTBylaw::AddVariable(
@@ -942,12 +951,14 @@ bool OTBylaw::AddClause(OTClause& theClause)
         theClause.SetBylaw(*this);
 
         return true;
-    } else
-        otOut << "OTBylaw::" << __FUNCTION__
-              << ": Failed -- Clause was already there named "
-              << str_clause_name << ".\n";
+    } else {
+        LogNormal(OT_METHOD)(__FUNCTION__)(
+            ":  Failed -- Clause was already there named ")(str_clause_name)(
+            ".")
+            .Flush();
 
-    return false;
+        return false;
+    }
 }
 
 const char* OTBylaw::GetLanguage() const
