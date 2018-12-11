@@ -55,6 +55,7 @@ public:
 
     EXPORT static char const* _GetTypeString(AccountType accountType);
 
+    EXPORT std::string Alias() const;
     EXPORT bool DisplayStatistics(String& contents) const override;
     EXPORT Amount GetBalance() const;
     EXPORT const Identifier& GetInstrumentDefinitionID() const;
@@ -92,6 +93,7 @@ public:
     // If you pass the identifier in, the outbox hash is recorded there
     EXPORT bool SaveOutbox(Ledger& box);
     EXPORT bool SaveOutbox(Ledger& box, Identifier& hash);
+    EXPORT void SetAlias(const std::string& alias);
     EXPORT void SetInboxHash(const Identifier& input);
     EXPORT void SetOutboxHash(const Identifier& input);
     EXPORT void SetStashTransNum(const TransactionNumber transNum)
@@ -123,6 +125,7 @@ private:
     // Hash of this account's Outbox, so we don't download it more often than
     // necessary.
     OTIdentifier outboxHash_;
+    std::string alias_;
 
     static Account* GenerateNewAccount(
         const api::Core& core,

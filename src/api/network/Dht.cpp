@@ -310,12 +310,13 @@ bool Dht::ProcessPublicNym(
     }
 
     if (!foundValid) {
-        otErr << __FUNCTION__ << "Found results, but none are valid."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Found results, but none are valid.")
+            .Flush();
     }
 
     if (!foundData) {
-        otErr << __FUNCTION__ << "All results are empty" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": All results are empty.").Flush();
     }
 
     return foundData;
@@ -359,12 +360,13 @@ bool Dht::ProcessServerContract(
     }
 
     if (!foundValid) {
-        otErr << __FUNCTION__ << "Found results, but none are valid."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Found results, but none are valid.")
+            .Flush();
     }
 
     if (!foundData) {
-        otErr << __FUNCTION__ << "All results are empty" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": All results are empty.").Flush();
     }
 
     return foundData;
@@ -409,12 +411,13 @@ bool Dht::ProcessUnitDefinition(
     }
 
     if (!foundValid) {
-        otErr << __FUNCTION__ << "Found results, but none are valid."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Found results, but none are valid.")
+            .Flush();
     }
 
     if (!foundData) {
-        otErr << __FUNCTION__ << "All results are empty" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": All results are empty.").Flush();
     }
 
     return foundData;

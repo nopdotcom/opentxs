@@ -1,0 +1,25 @@
+#!/bin/sh
+
+CC="@CMAKE_C_COMPILER@"
+CXX="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+CXXFLAGS="@CMAKE_CXX_FLAGS@"
+LDFLAGS="@CMAKE_C_LINK_FLAGS@"
+
+@CMAKE_CURRENT_BINARY_DIR@/secp256k1/src/configure \
+  --prefix="@CMAKE_CURRENT_BINARY_DIR@/secp256k1/install" \
+  @OT_HOST@ \
+  @OT_SYSROOT_BUNDLED@ \
+  --enable-shared=no \
+  --enable-static=yes \
+  --with-pic \
+  --disable-openssl-tests \
+  --enable-experimental \
+  --disable-exhaustive-tests \
+  --enable-module-ecdh \
+  --enable-module-recovery \
+  --disable-jni \
+  --with-bignum=no \
+  --with-asm=no \
+  --disable-tests \
+  --disable-benchmark

@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The Open-Transactions developers
+// // Copyright (c) 2018 The Open-Transactions developers
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -74,24 +74,31 @@ bool MintLucre::AddDenomination(
     // Let's make sure it doesn't already exist
     auto theArmor = Armored::Factory();
     if (GetPublic(theArmor, lDenomination)) {
-        otErr << "Error: Denomination public already exists in "
-                 "OTMint::AddDenomination\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error: Denomination public already exists in AddDenomination.")
+            .Flush();
         return false;
     }
     if (GetPrivate(theArmor, lDenomination)) {
-        otErr << "Error: Denomination private already exists in "
-                 "OTMint::AddDenomination\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error: Denomination private already exists in "
+            "AddDenomination.")
+            .Flush();
         return false;
     }
 
     if ((nPrimeLength / 8) < (MIN_COIN_LENGTH + DIGEST_LENGTH)) {
-        otErr << "Prime must be at least "
-              << (MIN_COIN_LENGTH + DIGEST_LENGTH) * 8 << " bits\n";
+
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Prime must be at least ")(
+            (MIN_COIN_LENGTH + DIGEST_LENGTH) * 8)(" bits.")
+            .Flush();
         return false;
     }
 
     if (nPrimeLength % 8) {
-        otErr << "Prime length must be a multiple of 8\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Prime length must be a multiple of 8.")
+            .Flush();
         return false;
     }
 
@@ -223,8 +230,10 @@ bool MintLucre::SignToken(
         BIGNUM* bnSignature = bank.SignRequest(req);
 
         if (nullptr == bnSignature) {
-            otErr << "MAJOR ERROR!: Bank.SignRequest failed in "
-                     "MintLucre::SignToken\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": MAJOR ERROR!: Bank.SignRequest failed in "
+                "SignToken.")
+                .Flush();
         } else {
 
             // Write the request contents, followed by the signature contents,

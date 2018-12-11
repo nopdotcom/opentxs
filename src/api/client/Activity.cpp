@@ -170,8 +170,8 @@ Activity::ChequeData Activity::Cheque(
         case proto::PAYMENTWORKFLOWTYPE_INCOMINGTRANSFER:
         case proto::PAYMENTWORKFLOWTYPE_INTERNALTRANSFER:
         default: {
-            otErr << OT_METHOD << __FUNCTION__ << ": Wrong workflow type"
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong workflow type.")
+                .Flush();
 
             return output;
         }
@@ -181,8 +181,9 @@ Activity::ChequeData Activity::Cheque(
     const auto loaded = api_.Storage().Load(nym.str(), workflowID, workflow);
 
     if (false == loaded) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Workflow " << workflowID
-              << " for nym " << nym.str() << " can not be loaded" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Workflow ")(workflowID)(
+            " for nym ")(nym)(" can not be loaded.")
+            .Flush();
 
         return output;
     }
@@ -198,8 +199,9 @@ Activity::ChequeData Activity::Cheque(
     contract = api_.Wallet().UnitDefinition(unit);
 
     if (false == bool(contract)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to load unit definition contract" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to load unit definition contract.")
+            .Flush();
     }
 
     return output;
@@ -273,8 +275,9 @@ Activity::TransferData Activity::Transfer(
     contract = api_.Wallet().UnitDefinition(unit);
 
     if (false == bool(contract)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to load unit definition contract" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to load unit definition contract.")
+            .Flush();
     }
 
     return output;
@@ -333,14 +336,13 @@ std::unique_ptr<Message> Activity::Mail(
     std::unique_ptr<Message> output;
 
     if (!loaded) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to load Message"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to load Message.").Flush();
 
         return output;
     }
 
     if (raw.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Empty message" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Empty message.").Flush();
 
         return output;
     }
@@ -350,8 +352,8 @@ std::unique_ptr<Message> Activity::Mail(
     OT_ASSERT(output);
 
     if (false == output->LoadContractFromString(String::Factory(raw.c_str()))) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to deserialized Message"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to deserialized Message.")
+            .Flush();
 
         output.reset();
     }
@@ -599,8 +601,9 @@ std::shared_ptr<const std::string> Activity::PaymentText(
     const auto loaded = api_.Storage().Load(nym.str(), workflowID, workflow);
 
     if (false == loaded) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Workflow " << workflowID
-              << " for nym " << nym.str() << " can not be loaded" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Workflow ")(workflowID)(
+            " for nym ")(nym)(" can not be loaded.")
+            .Flush();
 
         return output;
     }
@@ -669,8 +672,8 @@ void Activity::preload(
     const auto message = Mail(nymID, id, box);
 
     if (!message) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to load message "
-              << String::Factory(id) << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load message ")(id)(".")
+            .Flush();
 
         return;
     }
@@ -678,29 +681,30 @@ void Activity::preload(
     auto nym = api_.Wallet().Nym(nymID);
 
     if (false == bool(nym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to load recipent nym."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load recipent nym.")
+            .Flush();
 
         return;
     }
 
-    otErr << OT_METHOD << __FUNCTION__ << ": Decrypting message " << id->str()
-          << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Decrypting message ")(id)(".")
+        .Flush();
     auto peerObject = PeerObject::Factory(
         contact_, api_.Wallet(), nym, message->m_ascPayload);
-    otErr << OT_METHOD << __FUNCTION__ << ": Message " << id->str()
-          << " decrypted." << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Message ")(id)(" decrypted.").Flush();
 
     if (!peerObject) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to instantiate peer object." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to instantiate peer object.")
+            .Flush();
 
         return;
     }
 
     if (!peerObject->Message()) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Peer object does not contain a message." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Peer object does not contain a message.")
+            .Flush();
 
         return;
     }
@@ -763,8 +767,9 @@ void Activity::thread_preload_thread(
     const bool loaded = api_.Storage().Load(nymID, threadID, thread);
 
     if (false == loaded) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to load thread "
-              << threadID << " for nym " << nymID << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load thread ")(
+            threadID)(" for nym ")(nymID)(".")
+            .Flush();
 
         return;
     }
@@ -773,9 +778,9 @@ void Activity::thread_preload_thread(
     std::size_t cached{0};
 
     if (start > size) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Error: start larger than size "
-              << "(" << std::to_string(start) << "/" << std::to_string(size)
-              << ")" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: start larger than size "
+                                           "(")(start)(" / ")(size)(").")
+            .Flush();
 
         return;
     }
@@ -789,8 +794,9 @@ void Activity::thread_preload_thread(
         switch (box) {
             case StorageBox::MAILINBOX:
             case StorageBox::MAILOUTBOX: {
-                otErr << OT_METHOD << __FUNCTION__ << ": Preloading item "
-                      << item.id() << " in thread " << threadID << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Preloading item ")(
+                    item.id())(" in thread ")(threadID)(".")
+                    .Flush();
                 MailText(
                     Identifier::Factory(nymID),
                     Identifier::Factory(item.id()),

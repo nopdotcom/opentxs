@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd "@CMAKE_CURRENT_BINARY_DIR@/lmdb/src/libraries/liblmdb/" &&
+@OT_BUNDLED_MAKE@ CC="@CMAKE_C_COMPILER@" CFLAGS="@CMAKE_C_FLAGS@ -fPIC -DMDB_USE_ROBUST=0" AR=@CMAKE_AR@ liblmdb.a

@@ -35,6 +35,8 @@ public:
         virtual void operator()(Widget* object, const network::zeromq::Message&)
             const = 0;
 
+        virtual ~MessageFunctor() = default;
+
     protected:
         MessageFunctor() = default;
 

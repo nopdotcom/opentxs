@@ -107,8 +107,9 @@ void PayableList::process_contact(
     const auto contact = api_.Contacts().Contact(id);
 
     if (false == bool(contact)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Error: Contact " << id->str()
-              << " can not be loaded." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: Contact ")(id)(
+            " can not be loaded.")
+            .Flush();
 
         return;
     }
@@ -172,5 +173,10 @@ void PayableList::startup()
     }
 
     startup_complete_->On();
+}
+
+PayableList::~PayableList()
+{
+    for (auto& it : listeners_) { delete it.second; }
 }
 }  // namespace opentxs::ui::implementation

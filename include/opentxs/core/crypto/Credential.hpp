@@ -73,22 +73,22 @@ public:
         credential.reset(new C(api, owner, nymParameters));
 
         if (!credential) {
-            otErr << __FUNCTION__ << ": Failed to construct credential."
-                  << std::endl;
+            LogOutput(": Failed to construct credential.")
+                  .Flush();
 
             return nullptr;
         }
 
         if (!credential->New(nymParameters)) {
-            otErr << __FUNCTION__ << ": Failed to sign credential."
-                  << std::endl;
+            LogOutput(": Failed to sign credential.")
+                  .Flush();
 
             return nullptr;
         }
 
         if (!credential->Save()) {
-            otErr << __FUNCTION__ << ": Failed to save credential."
-                  << std::endl;
+            LogOutput(": Failed to save credential.")
+                  .Flush();
 
             return nullptr;
         }

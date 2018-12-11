@@ -175,6 +175,16 @@ else()
   set(bundled-sqlite "")
 endif()
 
+if(OT_BUNDLED_LMDB)
+  set_source_files_properties(
+    ${bundled-lmdb-path}
+    PROPERTIES
+    EXTERNAL_OBJECT true
+    GENERATED true
+  )
+  add_dependencies(opentxs-storage-drivers lmdb)
+endif()
+
 if(OT_BUNDLED_LIBZMQ)
   set_source_files_properties(
     ${bundled-zmq-path}
@@ -240,6 +250,7 @@ set(object-deps
   ${bundled-sodium-path}
   ${bundled-secp256k1-path}
   ${bundled-sqlite}
+  ${bundled-lmdb-path}
   ${OT_SSL_LIBRARIES}
 )
 
@@ -314,7 +325,7 @@ if(OT_SHARED)
       target_link_libraries(${MODULE_NAME} PRIVATE ${SQLITE3_LIBRARIES})
   endif()
 
-  if (OT_STORAGE_LMDB)
+  if (OT_STORAGE_LMDB AND NOT OT_BUNDLED_LMDB)
       target_link_libraries(${MODULE_NAME} PRIVATE ${LMDB_LIBRARIES})
   endif()
 
@@ -383,7 +394,7 @@ if(OT_STATIC)
       target_link_libraries(${MODULE_NAME}_static PRIVATE ${SQLITE3_LIBRARIES})
   endif()
 
-  if (OT_STORAGE_LMDB)
+  if (OT_STORAGE_LMDB AND NOT OT_BUNDLED_LMDB)
     target_link_libraries(${MODULE_NAME}_static PRIVATE ${LMDB_LIBRARIES})
   endif()
 

@@ -23,7 +23,7 @@ class ContactList final : public ContactListList
 public:
     const Identifier& ID() const override { return owner_contact_id_; }
 
-    ~ContactList() = default;
+    ~ContactList();
 
 private:
     friend opentxs::Factory;

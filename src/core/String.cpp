@@ -588,10 +588,11 @@ bool String::DecodeIfArmored(bool bEscapedIsAllowed)
         bArmoredAndALSOescaped = true;
 
         if (!bEscapedIsAllowed) {
-            otErr << __FUNCTION__
-                  << ": Armored and escaped value passed in, "
-                     "but escaped are forbidden here. "
-                     "(Returning.)\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Armored and escaped value passed in, "
+                "but escaped are forbidden here. "
+                "(Returning).")
+                .Flush();
             return false;
         }
     } else if (Contains(OT_BEGIN_ARMORED)) {
@@ -619,11 +620,11 @@ bool String::DecodeIfArmored(bool bEscapedIsAllowed)
         // We're doing this: "-----BEGIN OT ARMORED" (Should worked for
         // escaped as well, here.)
         {
-            otErr << __FUNCTION__
-                  << ": Error loading string contents from "
-                     "ascii-armored encoding. "
-                     "Contents: \n"
-                  << Get() << "\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Error loading string contents from "
+                "ascii-armored encoding. "
+                "Contents: ")(Get())(".")
+                .Flush();
             return false;
         } else  // success loading the actual contents out of the ascii-armored
                 // version.
@@ -952,9 +953,10 @@ bool String::TokenizeIntoKeyValuePairs(
 
     if (wordexp(Get(), &exp_result, 0))  // non-zero == failure.
     {
-        otErr << "OTString::TokenizeIntoKeyValuePairs: Error calling wordexp() "
-                 "(to expand user-defined script args.)\nData: "
-              << *this << "\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error calling wordexp() "
+                 "(to expand user-defined script args). Data: ")
+              (static_cast<const opentxs::String&>(*this))(".").Flush();
         //        wordfree(&exp_result);
         return false;
     }
@@ -1003,8 +1005,9 @@ bool String::TokenizeIntoKeyValuePairs(
             k = i;
             while (txt[i] != quote && txt[i] != 0) i++;
             if (txt[i] != quote) {
-                otErr << __FUNCTION__ << ": Unmatched quotes in: " << txt
-                      << "\n";
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Unmatched quotes in: ")(
+                    txt)(".")
+                    .Flush();
                 return false;
             }
             k2 = i;
@@ -1024,8 +1027,9 @@ bool String::TokenizeIntoKeyValuePairs(
             v = i;
             while (txt[i] != quote && txt[i] != 0) i++;
             if (txt[i] != quote) {
-                otErr << __FUNCTION__ << ": Unmatched quotes in: " << txt
-                      << "\n";
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Unmatched quotes in: ")(
+                    txt)(".")
+                    .Flush();
                 return false;
             }
             v2 = i;

@@ -207,15 +207,15 @@ bool ZMQ::SetSocksProxy(const std::string& proxy) const
         notUsed);
 
     if (false == set) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to set socks proxy."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to set socks proxy.")
+            .Flush();
 
         return false;
     }
 
     if (false == api_.Config().Save()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to set save config."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to set save config.")
+            .Flush();
 
         return false;
     }
@@ -234,8 +234,8 @@ bool ZMQ::SetSocksProxy(const std::string& proxy) const
     }
 
     if (false == set) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to reset connection."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to reset connection.")
+            .Flush();
     }
 
     return set;
@@ -280,13 +280,13 @@ ConnectionState ZMQ::Status(const std::string& server) const
 bool ZMQ::verify_lock(const Lock& lock) const
 {
     if (lock.mutex() != &lock_) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Incorrect mutex." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Incorrect mutex.").Flush();
 
         return false;
     }
 
     if (false == lock.owns_lock()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Lock not owned." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Lock not owned.").Flush();
 
         return false;
     }

@@ -56,7 +56,6 @@ class Settings;
 #endif
 #endif
 
-OTLOG_IMPORT extern OTLogStream otErr;  // logs using OTLog::vError()
 
 extern LogSource LogOutput;  // otErr
 extern LogSource LogNormal;  // otOut

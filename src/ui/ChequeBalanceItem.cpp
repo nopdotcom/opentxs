@@ -232,7 +232,9 @@ std::string ChequeBalanceItem::UUID() const
 {
     if (cheque_) {
 
-        return uuid(cheque_->GetNotaryID(), cheque_->GetTransactionNum());
+        return api::client::Workflow::UUID(
+                   cheque_->GetNotaryID(), cheque_->GetTransactionNum())
+            ->str();
     }
 
     return {};

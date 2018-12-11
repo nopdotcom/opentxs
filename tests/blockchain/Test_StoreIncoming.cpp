@@ -45,16 +45,17 @@ public:
     }
 };
 
-proto::BlockchainTransaction* MakeTransaction(const std::string id)
+proto::BlockchainTransaction MakeTransaction(const std::string id)
 {
-    proto::BlockchainTransaction* Tx = new proto::BlockchainTransaction;
-    Tx->set_version(1);
-    Tx->set_txid(id);
-    Tx->set_chain(proto::CITEMTYPE_BTC);
-    Tx->set_txversion(1);
-    Tx->set_fee(1827);
-    Tx->set_memo("memo1");
-    Tx->set_confirmations(7);
+    proto::BlockchainTransaction Tx;
+    Tx.set_version(1);
+    Tx.set_txid(id);
+    Tx.set_chain(proto::CITEMTYPE_BTC);
+    Tx.set_txversion(1);
+    Tx.set_fee(1827);
+    Tx.set_memo("memo1");
+    Tx.set_confirmations(7);
+
     return Tx;
 }
 
@@ -93,22 +94,22 @@ TEST_F(Test_StoreIncoming, testIncomingDeposit1)
     EXPECT_TRUE(assigned);
 
     // 3. store incoming transaction
-    proto::BlockchainTransaction* Tx = MakeTransaction(
+    auto Tx = MakeTransaction(
         "5ddfedaf76b3abd902e1860115e163957aa16f72fc56b1f61bf314fc37781618");
     bool Stored = client_.Blockchain().StoreIncoming(
         Identifier::Factory(Alice),
         Identifier::Factory(AccountID),
         AddrPtr->index(),
         EXTERNAL_CHAIN,
-        *Tx);
+        Tx);
 
-    std::cout << "Stored incoming transaction " << Tx->txid() << "\n";
+    std::cout << "Stored incoming transaction " << Tx.txid() << "\n";
     EXPECT_TRUE(Stored);
 
     // test: transaction is saved
-    std::string TXID = Tx->txid();
+    std::string TXID = Tx.txid();
     std::shared_ptr<proto::BlockchainTransaction> StoredTx =
-        client_.Blockchain().Transaction(Tx->txid());
+        client_.Blockchain().Transaction(Tx.txid());
 
     EXPECT_TRUE(bool(StoredTx));
     EXPECT_EQ(StoredTx->version(), 1);
@@ -165,18 +166,18 @@ TEST_F(Test_StoreIncoming, testIncomingDeposit1)
         EXTERNAL_CHAIN);
     EXPECT_TRUE(assigned2);
 
-    proto::BlockchainTransaction* Tx2 = MakeTransaction(
+    auto Tx2 = MakeTransaction(
         "6ddfedaf76b3abd902e1860115e163957aa16f72fc56b1f61bf314fc37781616");
     bool Stored2 = client_.Blockchain().StoreIncoming(
         Identifier::Factory(Alice),
         Identifier::Factory(AccountID),
         Address2->index(),
         EXTERNAL_CHAIN,
-        *Tx2);
+        Tx2);
     EXPECT_TRUE(Stored2);
 
     std::shared_ptr<proto::BlockchainTransaction> StoredTx2 =
-        client_.Blockchain().Transaction(Tx2->txid());
+        client_.Blockchain().Transaction(Tx2.txid());
     // test: tx is associated in deposit address
     std::unique_ptr<proto::Bip44Address> AddrPtr2 =
         client_.Blockchain().LoadAddress(
@@ -236,22 +237,22 @@ TEST_F(Test_StoreIncoming, testIncomingDeposit_UnknownContact)
     EXPECT_EQ(AddrPtr->index(), NextDepositIndex);
 
     // 2. store incoming transaction
-    proto::BlockchainTransaction* Tx = MakeTransaction(
+    auto Tx = MakeTransaction(
         "5688c51b241770ff488eb1c425d608e9de0c25d4df31f0b49fa2b5a90dade126");
     bool Stored = client_.Blockchain().StoreIncoming(
         Identifier::Factory(Alice),
         Identifier::Factory(AccountID),
         AddrPtr->index(),
         EXTERNAL_CHAIN,
-        *Tx);
+        Tx);
 
-    std::cout << "Stored incoming transaction " << Tx->txid() << "\n";
+    std::cout << "Stored incoming transaction " << Tx.txid() << "\n";
     EXPECT_TRUE(Stored);
 
     // test: transaction is saved
-    std::string TXID = Tx->txid();
+    std::string TXID = Tx.txid();
     std::shared_ptr<proto::BlockchainTransaction> StoredTx =
-        client_.Blockchain().Transaction(Tx->txid());
+        client_.Blockchain().Transaction(Tx.txid());
 
     EXPECT_TRUE(bool(StoredTx));
     EXPECT_EQ(StoredTx->version(), 1);
@@ -303,5 +304,4 @@ TEST_F(Test_StoreIncoming, testIncomingDeposit_UnknownContact)
     EXPECT_STREQ("", Deposit.account().c_str());
     EXPECT_TRUE(Deposit.unread());
 }
-
 }  // namespace

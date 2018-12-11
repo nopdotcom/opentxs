@@ -1,0 +1,25 @@
+#!/bin/sh
+
+CC="@CMAKE_C_COMPILER@"
+CXX="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+CXXFLAGS="@CMAKE_CXX_FLAGS@"
+LDFLAGS="@CMAKE_CXX_LINK_FLAGS@"
+
+cd @CMAKE_CURRENT_BINARY_DIR@/protobuf/src &&
+./autogen.sh &&
+@CMAKE_CURRENT_BINARY_DIR@/protobuf/src/configure \
+  --prefix="@CMAKE_CURRENT_BINARY_DIR@/protobuf/install" \
+  @OT_HOST@ \
+  @OT_SYSROOT_BUNDLED@ \
+  --enable-shared=no \
+  --enable-static=yes \
+  --with-pic \
+  --enable-cross-compile \
+  --with-protoc=protoc \
+  --with-zlib \
+  --with-zlib-include="@ZLIB_INCLUDE_DIRS@" \
+  --with-zlib-lib="@ZLIB_LIBRARIES@" \
+  --disable-maintainer-mode \
+  --enable-fast-install \
+  @OT_ANDROID_LOG@

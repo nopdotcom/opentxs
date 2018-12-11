@@ -239,4 +239,9 @@ void AccountSummary::startup()
 
     startup_complete_->On();
 }
+
+AccountSummary::~AccountSummary()
+{
+    for (auto& it : listeners_) { delete it.second; }
+}
 }  // namespace opentxs::ui::implementation

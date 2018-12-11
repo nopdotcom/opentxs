@@ -1,0 +1,19 @@
+#!/bin/sh
+
+CC="@CMAKE_C_COMPILER@"
+CXX="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+CXXFLAGS="@CMAKE_CXX_FLAGS@"
+LDFLAGS="@CMAKE_C_LINK_FLAGS@"
+
+@CMAKE_CURRENT_BINARY_DIR@/sodium/src/configure \
+  --prefix="@CMAKE_CURRENT_BINARY_DIR@/sodium/install" \
+  @OT_HOST@ \
+  @OT_SYSROOT_BUNDLED@ \
+  --enable-shared=no \
+  --enable-static=yes \
+  --with-pic \
+  --with-pthreads \
+  --disable-asm \
+  --disable-soname-versions \
+  --enable-minimal

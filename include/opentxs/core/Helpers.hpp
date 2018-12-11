@@ -33,8 +33,9 @@ opentxs::Account::AccountType TranslateAccountTypeStringToEnum(
     else if (acctTypeString.Compare("stash"))
         acctType = opentxs::Account::stash;
     else
-        opentxs::otErr << "Error: Unknown account type: " << acctTypeString
-                       << "\n";
+        opentxs::LogOutput(
+            ": Error: Unknown account type: ")(acctTypeString)
+                       (".").Flush();
 
     return acctType;
 }

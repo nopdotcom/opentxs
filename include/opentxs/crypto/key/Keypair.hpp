@@ -61,8 +61,7 @@ public:
         const OTPasswordData* pPWData = nullptr) const
     {
         if (false == HasPrivateKey()) {
-            otErr << "opentxs::crypto::key::Keypair::" << __FUNCTION__
-                  << ": Missing private key. Can not sign." << std::endl;
+            LogOutput(": Missing private key. Can not sign.").Flush();
 
             return false;
         }

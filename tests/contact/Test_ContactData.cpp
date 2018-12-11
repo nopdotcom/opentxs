@@ -317,29 +317,23 @@ void Test_ContactData::testAddItemMethod2(
     ASSERT_TRUE(contactItem4->isActive());
 }
 
-// This needs to be updated when CONTACT_CONTACT_DATA_VERSION in Types.hpp
-// changes.
-static const auto& expectedStringOutput =
-    "Version 5 contact data\nSections found: 1\n- Section: Identifier, "
-    "version: 5 containing 1 item(s).\n-- Item type: \"employee of\", "
-    "value: \"activeContactItemValue\", start: 0, end: 0, version: 5\n--- "
-    "Attributes: Active \n";
-
+static const std::string expectedStringOutput =
+    std::string{"Version "} + std::to_string(CONTACT_CONTACT_DATA_VERSION) +
+    std::string(
+        " contact data\nSections found: 1\n- Section: Identifier, version: ") +
+    std::to_string(CONTACT_CONTACT_DATA_VERSION) +
+    std::string{" containing 1 item(s).\n-- Item type: \"employee of\", value: "
+                "\"activeContactItemValue\", start: 0, end: 0, version: "} +
+    std::to_string(CONTACT_CONTACT_DATA_VERSION) +
+    std::string{"\n--- Attributes: Active \n"};
 }  // namespace
-
-TEST(ContactData, Check_Version)
-{
-    ASSERT_EQ(5, CONTACT_CONTACT_DATA_VERSION)
-        << "Update the assert in this test case and expectedStringOutput if "
-           "CONTACT_CONTACT_DATA_VERSION has changed.";
-}
 
 TEST_F(Test_ContactData, PrintContactData)
 {
     const auto& data1 = contactData_.AddItem(activeContactItem_);
     const auto& dataString =
         opentxs::ContactData::PrintContactData(data1.Serialize());
-    ASSERT_STREQ(expectedStringOutput, dataString.c_str());
+    ASSERT_STREQ(expectedStringOutput.c_str(), dataString.c_str());
 }
 
 TEST_F(Test_ContactData, first_constructor)

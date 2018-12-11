@@ -155,8 +155,8 @@ std::shared_ptr<const class Contact> Contacts::contact(
         new class Contact(api_.Wallet(), label));
 
     if (false == bool(contact)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to create new contact."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to create new contact.")
+            .Flush();
 
         return {};
     }
@@ -173,8 +173,8 @@ std::shared_ptr<const class Contact> Contacts::contact(
     auto& output = it->second.second;
 
     if (false == api_.Storage().Store(*output)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to create save contact."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to create save contact.")
+            .Flush();
         contact_map_.erase(it);
 
         return {};
@@ -255,7 +255,7 @@ void Contacts::import_contacts(const rLock& lock)
 
 void Contacts::init_nym_map(const rLock& lock)
 {
-    otErr << OT_METHOD << __FUNCTION__ << ": Upgrading indices" << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Upgrading indices.").Flush();
 
     for (const auto& it : api_.Storage().ContactList()) {
         const auto& contactID = Identifier::Factory(it.first);
@@ -276,8 +276,9 @@ void Contacts::init_nym_map(const rLock& lock)
         const auto type = contact->Type();
 
         if (proto::CITEMTYPE_ERROR == type) {
-            otErr << OT_METHOD << __FUNCTION__ << ": Invalid contact "
-                  << it.first << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid contact ")(it.first)(
+                ".")
+                .Flush();
             api_.Storage().DeleteContact(it.first);
         }
 
@@ -301,8 +302,8 @@ Contacts::ContactMap::iterator Contacts::load_contact(
     const auto loaded = api_.Storage().Load(id.str(), serialized, SILENT);
 
     if (false == loaded) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to load contact "
-              << String::Factory(id) << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load contact ")(id)(".")
+            .Flush();
 
         return contact_map_.end();
     }
@@ -313,8 +314,9 @@ Contacts::ContactMap::iterator Contacts::load_contact(
         new class Contact(api_.Wallet(), *serialized));
 
     if (false == bool(contact)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to instantate serialized contact." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to instantate serialized contact.")
+            .Flush();
 
         return contact_map_.end();
     }
@@ -330,8 +332,9 @@ std::shared_ptr<const class Contact> Contacts::Merge(
     auto childContact = contact(lock, child);
 
     if (false == bool(childContact)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Child contact " << child.str()
-              << " can not be loaded." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Child contact ")(child)(
+            " can not be loaded.")
+            .Flush();
 
         return {};
     }
@@ -339,8 +342,9 @@ std::shared_ptr<const class Contact> Contacts::Merge(
     const auto& childID = childContact->ID();
 
     if (childID != child) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Child contact " << child.str()
-              << " is already merged into " << childID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Child contact ")(child)(
+            " is already merged into ")(childID)(".")
+            .Flush();
 
         return {};
     }
@@ -348,8 +352,9 @@ std::shared_ptr<const class Contact> Contacts::Merge(
     auto parentContact = contact(lock, parent);
 
     if (false == bool(parentContact)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Parent contact "
-              << parent.str() << " can not be loaded." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Parent contact ")(parent)(
+            " can not be loaded.")
+            .Flush();
 
         return {};
     }
@@ -357,9 +362,9 @@ std::shared_ptr<const class Contact> Contacts::Merge(
     const auto& parentID = parentContact->ID();
 
     if (parentID != parent) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Parent contact "
-              << parent.str() << " is merged into " << parentID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Parent contact ")(parent)(
+            " is merged into ")(parentID)(".")
+            .Flush();
 
         return {};
     }
@@ -372,15 +377,17 @@ std::shared_ptr<const class Contact> Contacts::Merge(
     lhs += rhs;
 
     if (false == api_.Storage().Store(rhs)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to create save child contact." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to create save child contact.")
+            .Flush();
 
         OT_FAIL;
     }
 
     if (false == api_.Storage().Store(lhs)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to create save parent contact." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to create save parent contact.")
+            .Flush();
 
         OT_FAIL;
     }
@@ -547,15 +554,15 @@ std::shared_ptr<const class Contact> Contacts::NewContactFromAddress(
     auto& contact = *it.second;
 
     if (false == contact.AddBlockchainAddress(address, currency)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to add address to contact." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to add address to contact.")
+            .Flush();
 
         OT_FAIL;
     }
 
     if (false == api_.Storage().Store(contact)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to save contact."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to save contact.").Flush();
 
         OT_FAIL;
     }
@@ -635,8 +642,9 @@ void Contacts::save(class Contact* contact) const
     OT_ASSERT(nullptr != contact);
 
     if (false == api_.Storage().Store(*contact)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to create or save contact." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to create or save contact.")
+            .Flush();
 
         OT_FAIL;
     }
@@ -644,8 +652,9 @@ void Contacts::save(class Contact* contact) const
     const auto& id = contact->ID();
 
     if (false == api_.Storage().SetContactAlias(id.str(), contact->Label())) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to create or save contact." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to create or save contact.")
+            .Flush();
 
         OT_FAIL;
     }
@@ -677,7 +686,7 @@ std::shared_ptr<const class Contact> Contacts::Update(
     auto nym = api_.Wallet().Nym(serialized);
 
     if (false == bool(nym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid nym." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid nym.").Flush();
 
         return {};
     }
@@ -702,9 +711,9 @@ std::shared_ptr<const class Contact> Contacts::Update(
     const auto contactID = Identifier::Factory(contactIdentifier);
 
     if (contactIdentifier.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Nym " << String::Factory(nymID)
-              << " is not associated with a contact. Creating a new contact."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Nym ")(nymID)(
+            " is not associated with a contact. Creating a new contact.")
+            .Flush();
 #if OT_CRYPTO_SUPPORTED_SOURCE_BIP47
         auto code = api_.Factory().PaymentCode(nym->PaymentCode());
 #endif
@@ -808,19 +817,21 @@ void Contacts::update_nym_map(
             oldContact->RemoveNym(nymID);
 
             if (false == api_.Storage().Store(*oldContact)) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Unable to create or save contact." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Unable to create or save contact.")
+                    .Flush();
 
                 OT_FAIL;
             }
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Duplicate nym found."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Duplicate nym found.")
+                .Flush();
             contact.RemoveNym(nymID);
 
             if (false == api_.Storage().Store(contact)) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Unable to create or save contact." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Unable to create or save contact.")
+                    .Flush();
 
                 OT_FAIL;
             }
@@ -833,13 +844,13 @@ void Contacts::update_nym_map(
 bool Contacts::verify_write_lock(const rLock& lock) const
 {
     if (lock.mutex() != &lock_) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Incorrect mutex." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Incorrect mutex.").Flush();
 
         return false;
     }
 
     if (false == lock.owns_lock()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Lock not owned." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Lock not owned.").Flush();
 
         return false;
     }

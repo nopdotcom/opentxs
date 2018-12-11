@@ -258,6 +258,8 @@ public:
     ObjectList SeedList() const override;
     std::string ServerAlias(const std::string& id) const override;
     ObjectList ServerList() const override;
+    bool SetAccountAlias(const std::string& id, const std::string& alias)
+        const override;
     bool SetContactAlias(const std::string& id, const std::string& alias)
         const override;
     bool SetDefaultSeed(const std::string& id) const override;

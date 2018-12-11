@@ -43,9 +43,6 @@ protected:
     std::unique_ptr<std::thread> startup_{nullptr};
 
     static StorageBox extract_type(const proto::PaymentWorkflow& workflow);
-    static std::string uuid(
-        const Identifier& notary,
-        const TransactionNumber number);
 
     std::string get_contact_name(const Identifier& nymID) const;
 

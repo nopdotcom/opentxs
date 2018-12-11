@@ -73,6 +73,7 @@ Account::Account(
     , markForDeletion_(false)
     , inboxHash_(Identifier::Factory())
     , outboxHash_(Identifier::Factory())
+    , alias_()
 {
     InitAccount();
     SetNymID(nymID);
@@ -90,6 +91,7 @@ Account::Account(const api::Core& core)
     , markForDeletion_(false)
     , inboxHash_(Identifier::Factory())
     , outboxHash_(Identifier::Factory())
+    , alias_()
 {
     InitAccount();
 }
@@ -109,6 +111,7 @@ Account::Account(
     , markForDeletion_(false)
     , inboxHash_(Identifier::Factory())
     , outboxHash_(Identifier::Factory())
+    , alias_(name.Get())
 {
     InitAccount();
     m_strName = name;
@@ -128,6 +131,7 @@ Account::Account(
     , markForDeletion_(false)
     , inboxHash_(Identifier::Factory())
     , outboxHash_(Identifier::Factory())
+    , alias_()
 {
     InitAccount();
 }
@@ -137,6 +141,8 @@ char const* Account::_GetTypeString(AccountType accountType)
     std::int32_t index = static_cast<std::int32_t>(accountType);
     return __TypeStringsAccount[index];
 }
+
+std::string Account::Alias() const { return alias_; }
 
 bool Account::create_box(
     std::unique_ptr<Ledger>& box,
@@ -149,8 +155,8 @@ bool Account::create_box(
     box.reset(api_.Factory().Ledger(nymID, accountID, serverID).release());
 
     if (false == bool(box)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to construct ledger"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to construct ledger.")
+            .Flush();
 
         return false;
     }
@@ -159,8 +165,7 @@ bool Account::create_box(
         box->CreateLedger(nymID, accountID, serverID, type, true);
 
     if (false == created) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to generate box"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to generate box.").Flush();
 
         return false;
     }
@@ -168,8 +173,7 @@ bool Account::create_box(
     const auto signature = box->SignContract(signer);
 
     if (false == signature) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to sign box"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to sign box.").Flush();
 
         return false;
     }
@@ -177,8 +181,8 @@ bool Account::create_box(
     const auto serialized = box->SaveContract();
 
     if (false == serialized) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to serialize box"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to serialize box.")
+            .Flush();
 
         return false;
     }
@@ -238,12 +242,12 @@ bool Account::save_box(
     void (Account::*set)(const Identifier&))
 {
     if (!IsSameAccount(box)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": ERROR: The ledger passed in, "
-              << "isn't even for this account!\n   Acct ID: "
-              << GetRealAccountID().str()
-              << "\n  Other ID: " << box.GetRealAccountID().str()
-              << "\n Notary ID: " << GetRealNotaryID().str()
-              << "\n Other ID: " << box.GetRealNotaryID().str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": ERROR: The ledger passed in, "
+            "isn't even for this account! Acct ID: ")(GetRealAccountID())(
+            ". Other ID: ")(box.GetRealAccountID())(". Notary ID: ")(
+            GetRealNotaryID())(". Other ID: ")(box.GetRealNotaryID())(".")
+            .Flush();
 
         return false;
     }
@@ -333,21 +337,18 @@ bool Account::GetOutboxHash(Identifier& output)
 
 bool Account::InitBoxes(const Nym& signer)
 {
-    otErr << OT_METHOD << __FUNCTION__ << ": Generating inbox/outbox."
-          << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Generating inbox/outbox.").Flush();
     std::unique_ptr<Ledger> inbox{LoadInbox(signer)};
     std::unique_ptr<Ledger> outbox{LoadInbox(signer)};
 
     if (inbox) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Inbox already exists."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Inbox already exists.").Flush();
 
         return false;
     }
 
     if (false == create_box(inbox, signer, ledgerType::inbox)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to create inbox"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to create inbox.").Flush();
 
         return false;
     }
@@ -355,22 +356,20 @@ bool Account::InitBoxes(const Nym& signer)
     OT_ASSERT(inbox);
 
     if (false == SaveInbox(*inbox)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to save inbox"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save inbox.").Flush();
 
         return false;
     }
 
     if (outbox) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Inbox already exists."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Inbox already exists.").Flush();
 
         return false;
     }
 
     if (false == create_box(outbox, signer, ledgerType::outbox)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to create outbox"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to create outbox.")
+            .Flush();
 
         return false;
     }
@@ -378,8 +377,7 @@ bool Account::InitBoxes(const Nym& signer)
     OT_ASSERT(outbox);
 
     if (false == SaveOutbox(*outbox)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to save outbox"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save outbox.").Flush();
 
         return false;
     }
@@ -526,8 +524,10 @@ Account* Account::LoadExistingAccount(
 
     if (!OTPaths::ConfirmCreateFolder(
             strAccountPath, folderAlreadyExist, folderIsNew)) {
-        otErr << "Unable to find or create accounts folder: "
-              << OTFolders::Account() << "\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to find or create accounts folder: ")(
+            OTFolders::Account())(".")
+            .Flush();
         return nullptr;
     }
 
@@ -549,7 +549,7 @@ Account* Account::LoadExistingAccount(
             "")) {
         LogVerbose(OT_METHOD)(__FUNCTION__)(": File does not exist: ")(
             account->m_strFoldername)(Log::PathSeparator())(
-            account->m_strFilename)
+            account->m_strFilename)(".")
             .Flush();
 
         return nullptr;
@@ -608,7 +608,9 @@ bool Account::GenerateNewAccount(
     auto payload = Data::Factory();
     // TODO: hardcoding. Plus: is 100 bytes of random a little much here?
     if (!payload->Randomize(100)) {
-        otErr << __FUNCTION__ << ": Failed trying to acquire random numbers.\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed trying to acquire random numbers.")
+            .Flush();
         return false;
     }
 
@@ -616,7 +618,8 @@ bool Account::GenerateNewAccount(
     // OTIdentifier).
     auto newID = Identifier::Factory();
     if (!newID->CalculateDigest(payload)) {
-        otErr << __FUNCTION__ << ": Error generating new account ID.\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error generating new account ID.")
+            .Flush();
         return false;
     }
 
@@ -644,8 +647,9 @@ bool Account::GenerateNewAccount(
             m_strFilename->Get(),
             "",
             "")) {
-        otErr << __FUNCTION__ << ": Account already exists: " << m_strFilename
-              << "\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account already exists: ")(
+            m_strFilename)(".")
+            .Flush();
         return false;
     }
 
@@ -666,7 +670,7 @@ bool Account::GenerateNewAccount(
         String::Factory(instrumentDefinitionID));
 
     LogDebug(OT_METHOD)(__FUNCTION__)(": Creating new account, type: ")(
-        instrumentDefinitionID)
+        instrumentDefinitionID)(".")
         .Flush();
 
     SetRealNotaryID(notaryID);
@@ -878,16 +882,19 @@ std::int32_t Account::ProcessXMLNode(IrrXMLReader*& xml)
         acctType = String::Factory(xml->getAttributeValue("type"));
 
         if (!acctType->Exists()) {
-            otErr << "OTAccount::ProcessXMLNode: Failed: Empty account "
-                     "'type' attribute.\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed: Empty account "
+                                               "'type' attribute.")
+                .Flush();
             return -1;
         }
 
         acctType_ = TranslateAccountTypeStringToEnum(acctType);
 
         if (Account::err_acct == acctType_) {
-            otErr << "OTAccount::ProcessXMLNode: Failed: account 'type' "
-                     "attribute contains unknown value.\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed: account 'type' "
+                "attribute contains unknown value.")
+                .Flush();
             return -1;
         }
 
@@ -897,8 +904,9 @@ std::int32_t Account::ProcessXMLNode(IrrXMLReader*& xml)
         if (strAcctAssetType->Exists()) {
             acctInstrumentDefinitionID_->SetString(strAcctAssetType);
         } else {
-            otErr << "OTAccount::ProcessXMLNode: Failed: missing "
-                     "instrumentDefinitionID.\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed: missing "
+                                               "instrumentDefinitionID.")
+                .Flush();
             return -1;
         }
         auto strAccountID =
@@ -968,8 +976,10 @@ std::int32_t Account::ProcessXMLNode(IrrXMLReader*& xml)
         retval = 1;
     } else if (strNodeName->Compare("stashinfo")) {
         if (!IsStashAcct()) {
-            otErr << "OTAccount::ProcessXMLNode: Error: Encountered stashinfo "
-                     "tag while loading NON-STASH account. \n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Error: Encountered stashinfo "
+                "tag while loading NON-STASH account.")
+                .Flush();
             return -1;
         }
 
@@ -979,9 +989,10 @@ std::int32_t Account::ProcessXMLNode(IrrXMLReader*& xml)
         if (!strStashTransNum->Exists() ||
             ((lTransNum = strStashTransNum->ToLong()) <= 0)) {
             stashTransNum_ = 0;
-            otErr << "OTAccount::ProcessXMLNode: Error: Bad transaction number "
-                     "for supposed corresponding cron item: "
-                  << lTransNum << " \n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Error: Bad transaction number "
+                "for supposed corresponding cron item: ")(lTransNum)(".")
+                .Flush();
             return -1;
         } else {
             stashTransNum_ = lTransNum;
@@ -1010,7 +1021,8 @@ bool Account::IsInternalServerAcct() const
         case Account::stash:
             return true;
         default:
-            otErr << "OTAccount::IsInternalServerAcct: Unknown account type.\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Unknown account type.")
+                .Flush();
             return false;
     }
     return false;
@@ -1029,7 +1041,8 @@ bool Account::IsOwnedByUser() const
         case Account::stash:
             return false;
         default:
-            otErr << "OTAccount::IsOwnedByUser: Unknown account type.\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Unknown account type.")
+                .Flush();
             return false;
     }
     return false;
@@ -1061,8 +1074,8 @@ bool Account::IsAllowedToGoNegative() const
         case Account::stash:
             return false;
         default:
-            otErr
-                << "OTAccount::IsAllowedToGoNegative: Unknown account type.\n";
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Unknown account type.")
+                .Flush();
             return false;
     }
     return false;
@@ -1081,6 +1094,8 @@ void Account::Release()
     Release_Account();
     OTTransactionType::Release();
 }
+
+void Account::SetAlias(const std::string& alias) { alias_ = alias; }
 
 Account::~Account() { Release_Account(); }
 }  // namespace opentxs

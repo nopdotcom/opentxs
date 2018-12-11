@@ -135,8 +135,9 @@ ServerAction::Action ServerAction::ActivateSmartContract(
     std::unique_ptr<OTSmartContract>& contract) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 10)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -201,8 +202,9 @@ ServerAction::Action ServerAction::CancelPaymentPlan(
     // purposeful "failure" ? Because if the failure comes from cancelling the
     // plan, the server reply transaction will have IsCancelled() set to true.
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -237,8 +239,9 @@ ServerAction::Action ServerAction::CreateMarketOffer(
     }
 
     if (!GetTransactionNumbers(nymID, notaryID, 10)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -267,8 +270,9 @@ ServerAction::Action ServerAction::DepositCashPurse(
     std::unique_ptr<Purse>& purse) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -289,8 +293,9 @@ ServerAction::Action ServerAction::DepositCheque(
     std::unique_ptr<Cheque>& cheque) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -434,8 +439,8 @@ bool ServerAction::GetTransactionNumbers(
     auto available = context.It().AvailableNumbers();
 
     if (available < quantity) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Asking server for more numbers"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Asking server for more numbers.")
+            .Flush();
         auto action = Action(new OTAPI_Func(
             GET_TRANSACTION_NUMBERS,
             lock_callback_({localNymID.str(), serverID.str()}),
@@ -444,8 +449,9 @@ bool ServerAction::GetTransactionNumbers(
             serverID));
         auto response = action->Run();
         if (response.empty()) {
-            otErr << OT_METHOD << __FUNCTION__ << ": Failed to obtain "
-                  << quantity << " numbers" << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to obtain ")(quantity)(
+                " numbers.")
+                .Flush();
             return false;
         }
 
@@ -454,8 +460,8 @@ bool ServerAction::GetTransactionNumbers(
             serverID.str(), localNymID.str(), msgWasSent, false);
 
         if (0 > download) {
-            otErr << OT_METHOD << __FUNCTION__ << ": Failed to retrieve nym."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to retrieve nym.")
+                .Flush();
 
             return false;
         }
@@ -464,8 +470,9 @@ bool ServerAction::GetTransactionNumbers(
         available = context.It().AvailableNumbers();
 
         if (available < quantity) {
-            otErr << OT_METHOD << __FUNCTION__ << ": Failed to obtain "
-                  << quantity << " numbers" << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to obtain ")(quantity)(
+                " numbers.")
+                .Flush();
 
             return false;
         }
@@ -497,8 +504,9 @@ bool ServerAction::DownloadNymbox(
     Utility util(context.It(), api_);
 
     if (0 >= context.It().UpdateRequestNumber()) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed calling update request number" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed calling update request number.")
+            .Flush();
 
         return false;
     }
@@ -508,8 +516,8 @@ bool ServerAction::DownloadNymbox(
         serverID.str(), localNymID.str(), msgWasSent, true);
 
     if (0 > download) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to retrieve nymbox."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to retrieve nymbox.")
+            .Flush();
 
         return false;
     }
@@ -538,8 +546,9 @@ ServerAction::Action ServerAction::ExchangeBasketCurrency(
     const bool direction) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -563,8 +572,9 @@ ServerAction::Action ServerAction::ExchangeCash(
     std::unique_ptr<Purse>& purse) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -689,8 +699,9 @@ ServerAction::Action ServerAction::KillMarketOffer(
     const TransactionNumber number) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -710,8 +721,9 @@ ServerAction::Action ServerAction::KillPaymentPlan(
     const TransactionNumber number) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -755,8 +767,9 @@ ServerAction::Action ServerAction::PayDividend(
     const Amount amountPerShare) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -778,8 +791,9 @@ ServerAction::Action ServerAction::ProcessInbox(
     std::unique_ptr<Ledger>& ledger) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -949,8 +963,9 @@ ServerAction::Action ServerAction::SendPayment(
     auto strPayment = String::Factory();
 
     if (false == bool(payment) || !payment->GetPaymentContents(strPayment)) {
-        otErr << "ServerAction::SendPayment: Empty payment argument - "
-                 "should never happen!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Empty payment argument - "
+                                           "should never happen!")
+            .Flush();
         OT_FAIL;
     }
 
@@ -978,8 +993,9 @@ ServerAction::Action ServerAction::SendTransfer(
     const std::string& memo) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -1046,8 +1062,9 @@ ServerAction::Action ServerAction::WithdrawCash(
     const Amount amount) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(
@@ -1070,8 +1087,9 @@ ServerAction::Action ServerAction::WithdrawVoucher(
     const std::string& memo) const
 {
     if (!GetTransactionNumbers(localNymID, serverID, 1)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to obtain transaction numbers" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed to obtain transaction numbers.")
+            .Flush();
     }
 
     return Action(new OTAPI_Func(

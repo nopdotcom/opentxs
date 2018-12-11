@@ -41,7 +41,7 @@ public:
     Amount Balance() const override { return balance_.load(); }
     std::string DisplayBalance() const override;
 
-    ~AccountActivity() = default;
+    ~AccountActivity();
 
 private:
     friend opentxs::Factory;

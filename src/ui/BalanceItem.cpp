@@ -244,21 +244,6 @@ std::chrono::system_clock::time_point BalanceItem::Timestamp() const
     return time_;
 }
 
-std::string BalanceItem::uuid(
-    const Identifier& notary,
-    const TransactionNumber number)
-{
-    LogTrace(OT_METHOD)(__FUNCTION__)(": UUID for notary ")(notary)(
-        " and transaction number ")(number)(" is ");
-    OTData preimage{notary};
-    preimage->Concatenate(&number, sizeof(number));
-    auto output = Identifier::Factory();
-    output->CalculateDigest(preimage);
-    LogTrace(output).Flush();
-
-    return output->str();
-}
-
 BalanceItem::~BalanceItem()
 {
     if (startup_ && startup_->joinable()) {

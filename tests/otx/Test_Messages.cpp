@@ -9,6 +9,7 @@
 
 using namespace opentxs;
 
+// TODO 1.14.0
 #define REPLY_VERSION 1
 #define REQUEST_VERSION 1
 

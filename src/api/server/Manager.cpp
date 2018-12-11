@@ -145,8 +145,8 @@ Manager::Manager(
 
 void Manager::Cleanup()
 {
-    otErr << OT_METHOD << __FUNCTION__ << ": Shutting down and cleaning up."
-          << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Shutting down and cleaning up.")
+        .Flush();
     message_processor_.cleanup();
     message_processor_p_.reset();
     server_p_.reset();
@@ -172,8 +172,7 @@ void Manager::generate_mint(
     auto mint = GetPrivateMint(Identifier::Factory(unitID), series);
 
     if (mint) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Mint already exists."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Mint already exists.").Flush();
 
         return;
     }
@@ -199,8 +198,8 @@ void Manager::generate_mint(
     const std::time_t validTo = now + validInterval.count();
 
     if (false == verify_mint_directory(serverID)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Failed to create mint directory." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to create mint directory.")
+            .Flush();
 
         return;
     }
@@ -494,8 +493,9 @@ void Manager::mint() const
         auto mint = GetPrivateMint(Identifier::Factory(unitID), last);
 
         if (false == bool(mint)) {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to load existing series." << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to load existing series.")
+                .Flush();
 
             continue;
         }
@@ -509,8 +509,9 @@ void Manager::mint() const
         if (generate) {
             generate_mint(serverID, unitID, next);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Existing mint file for "
-                  << unitID << " is still valid." << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Existing mint file for ")(
+                unitID)(" is still valid.")
+                .Flush();
         }
     }
 }
@@ -569,13 +570,13 @@ void Manager::UpdateMint(const Identifier& unitID) const
 bool Manager::verify_lock(const Lock& lock, const std::mutex& mutex) const
 {
     if (lock.mutex() != &mutex) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Incorrect mutex." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Incorrect mutex.").Flush();
 
         return false;
     }
 
     if (false == lock.owns_lock()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Lock not owned." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Lock not owned.").Flush();
 
         return false;
     }
@@ -599,8 +600,8 @@ std::shared_ptr<Mint> Manager::verify_mint(
     }
 
     if (false == mint->VerifyMint(server_.GetServerNym())) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid mint for " << unitID
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid mint for ")(unitID)(".")
+            .Flush();
 
         return {};
     }

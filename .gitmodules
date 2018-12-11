@@ -28,3 +28,7 @@
 [submodule "deps/libressl"]
 	path = deps/libressl
 	url = https://github.com/libressl-portable/portable
+[submodule "lmdb"]
+	path = deps/lmdb
+	url = https://github.com/LMDB/lmdb
+	branch = mdb.master

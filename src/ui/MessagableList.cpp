@@ -153,4 +153,9 @@ void MessagableList::startup()
 
     startup_complete_->On();
 }
+
+MessagableList::~MessagableList()
+{
+    for (auto& it : listeners_) { delete it.second; }
+}
 }  // namespace opentxs::ui::implementation

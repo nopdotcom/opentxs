@@ -427,4 +427,9 @@ void AccountActivity::startup()
     delete_inactive(active);
     startup_complete_->On();
 }
+
+AccountActivity::~AccountActivity()
+{
+    for (auto& it : listeners_) { delete it.second; }
+}
 }  // namespace opentxs::ui::implementation

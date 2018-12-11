@@ -24,7 +24,7 @@ public:
     proto::ContactItemType Currency() const override { return currency_; }
     const Identifier& NymID() const override { return nym_id_.get(); }
 
-    ~AccountSummary() = default;
+    ~AccountSummary();
 
 private:
     friend opentxs::Factory;

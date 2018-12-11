@@ -61,9 +61,10 @@ Settings::Settings(const String& strConfigFilePath)
     , m_strConfigurationFileExactPath(strConfigFilePath)
 {
     if (!m_strConfigurationFileExactPath->Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "m_strConfigurationFileExactPath"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error: "
+            "m_strConfigurationFileExactPath is empty!")
+            .Flush();
         OT_FAIL;
     }
 
@@ -92,8 +93,10 @@ bool Settings::Init()
 
     // Second Load, Throw Assert if Failed loading.
     if (!Load()) {
-        otErr << __FUNCTION__ << ": Error: Unable to load config file."
-              << " It should exist, as we just saved it!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error: Unable to load config file."
+            " It should exist, as we just saved it!")
+            .Flush();
         OT_FAIL;
     }
 
@@ -103,9 +106,10 @@ bool Settings::Init()
 bool Settings::Load(const String& strConfigurationFileExactPath) const
 {
     if (!strConfigurationFileExactPath.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strConfigurationFileExactPath"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error: "
+            "strConfigurationFileExactPath is empty!")
+            .Flush();
         return false;
     }
 
@@ -116,9 +120,9 @@ bool Settings::Load(const String& strConfigurationFileExactPath) const
     };
 
     if (!IsEmpty()) {
-        otErr << __FUNCTION__ << ": Bad: "
-              << "p_Settings"
-              << " is not Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Bad: p_Settings "
+                                           "is not empty!")
+            .Flush();
         OT_FAIL;
     }
 
@@ -147,9 +151,10 @@ bool Settings::Load(const String& strConfigurationFileExactPath) const
 bool Settings::Save(const String& strConfigurationFileExactPath) const
 {
     if (!strConfigurationFileExactPath.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strConfigurationFileExactPath"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error: "
+            "strConfigurationFileExactPath is empty!")
+            .Flush();
         return false;
     }
 
@@ -166,15 +171,13 @@ bool Settings::LogChange_str(
     const String& strValue) const
 {
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           " is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
 
@@ -253,28 +256,24 @@ bool Settings::Check_str(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (strSection.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is blank!")
+            .Flush();
         OT_FAIL;
     }
 
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
     if (strKey.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is blank!").Flush();
         OT_FAIL;
     }
 
@@ -302,28 +301,24 @@ bool Settings::Check_long(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (strSection.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is blank!")
+            .Flush();
         OT_FAIL;
     }
 
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
     if (strKey.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is Blank!").Flush();
         OT_FAIL;
     }
 
@@ -352,28 +347,24 @@ bool Settings::Check_bool(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (strSection.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is blank!")
+            .Flush();
         OT_FAIL;
     }
 
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
     if (strKey.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is blank!").Flush();
         OT_FAIL;
     }
 
@@ -406,28 +397,24 @@ bool Settings::Set_str(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           " is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (strSection.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is blank!")
+            .Flush();
         OT_FAIL;
     }
 
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
     if (strKey.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is blank!").Flush();
         OT_FAIL;
     }
 
@@ -497,28 +484,24 @@ bool Settings::Set_long(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (strSection.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is blank!")
+            .Flush();
         OT_FAIL;
     }
 
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
     if (strKey.Compare("")) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Blank!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is blank!").Flush();
         OT_FAIL;
     }
 
@@ -575,15 +558,13 @@ bool Settings::Set_bool(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           " is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
     const auto strValue = String::Factory(bValue ? "true" : "false");
@@ -599,15 +580,15 @@ bool Settings::CheckSetSection(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (!strComment.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strComment"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strComment "
+                                           "is empty!")
+            .Flush();
         OT_FAIL;
     }
 
@@ -657,15 +638,13 @@ bool Settings::CheckSet_str(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           " is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
 
@@ -718,15 +697,13 @@ bool Settings::CheckSet_long(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           " is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
 
@@ -766,15 +743,13 @@ bool Settings::CheckSet_bool(
     rLock lock(lock_);
 
     if (!strSection.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strSection"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strSection "
+                                           "is empty!")
+            .Flush();
         OT_FAIL;
     }
     if (!strKey.Exists()) {
-        otErr << __FUNCTION__ << ": Error: "
-              << "strKey"
-              << " is Empty!\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Error: strKey is empty!").Flush();
         OT_FAIL;
     }
 

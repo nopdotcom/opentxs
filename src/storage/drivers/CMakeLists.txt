@@ -5,12 +5,6 @@
 
 set(MODULE_NAME opentxs-storage-drivers)
 
-if (OT_STORAGE_LMDB)
-  include_directories(SYSTEM
-    ${LMDB_INCLUDE_DIRS}
-  )
-endif()
-
 set(cxx-sources
   StorageFS.cpp
   StorageFSGC.cpp
@@ -62,4 +56,8 @@ set_lib_property(${MODULE_NAME})
 
 if (OT_STORAGE_SQLITE)
   target_include_directories(${MODULE_NAME} PRIVATE ${OT_SQLITE_HEADERS})
+endif()
+
+if (OT_STORAGE_LMDB)
+  target_include_directories(${MODULE_NAME} PRIVATE ${OT_LMDB_HEADERS})
 endif()

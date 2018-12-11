@@ -16,7 +16,9 @@
 
 #include "Cash.hpp"
 
+#if OT_CASH
 #define OT_METHOD "opentxs::Cash"
+#endif
 
 namespace opentxs
 {

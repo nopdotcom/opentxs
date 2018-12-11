@@ -316,13 +316,17 @@ int Profile::sort_key(const proto::ContactSectionName type)
 
 void Profile::startup()
 {
-    otErr << OT_METHOD << __FUNCTION__ << ": Loading nym " << nym_id_->str()
-          << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Loading nym ")(nym_id_)(".").Flush();
     const auto nym = api_.Wallet().Nym(nym_id_);
 
     OT_ASSERT(nym)
 
     process_nym(*nym);
     startup_complete_->On();
+}
+
+Profile::~Profile()
+{
+    for (auto& it : listeners_) { delete it.second; }
 }
 }  // namespace opentxs::ui::implementation

@@ -107,6 +107,11 @@ class SymmetricProvider;
 class Trezor;
 }  // namespace crypto
 
+namespace identifier
+{
+class Nym;
+}  // namespace identifier
+
 namespace network
 {
 namespace zeromq
@@ -325,6 +330,7 @@ using OTZMQDealerSocket = Pimpl<network::zeromq::DealerSocket>;
 using OTZMQListenCallback = Pimpl<network::zeromq::ListenCallback>;
 using OTZMQFrame = Pimpl<network::zeromq::Frame>;
 using OTZMQMessage = Pimpl<network::zeromq::Message>;
+using OTNymID = Pimpl<identifier::Nym>;
 using OTZMQPairEventCallback = Pimpl<network::zeromq::PairEventCallback>;
 using OTZMQPairSocket = Pimpl<network::zeromq::PairSocket>;
 using OTZMQProxy = Pimpl<network::zeromq::Proxy>;

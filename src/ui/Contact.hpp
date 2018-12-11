@@ -25,7 +25,7 @@ public:
     std::string DisplayName() const override;
     std::string PaymentCode() const override;
 
-    ~Contact() = default;
+    ~Contact();
 
 private:
     friend opentxs::Factory;

@@ -77,6 +77,8 @@ private:
     proto::RPCResponse get_server_password(
         const proto::RPCCommand& command) const;
     const api::Core& get_session(std::int32_t instance) const;
+    proto::RPCResponse get_transaction_data(
+        const proto::RPCCommand& command) const;
     proto::RPCResponse get_unit_definitions(
         const proto::RPCCommand& command) const;
     proto::RPCResponse get_workflow(const proto::RPCCommand& command) const;
@@ -98,8 +100,11 @@ private:
         const proto::RPCCommand& command) const;
     proto::RPCResponse list_unit_definitions(
         const proto::RPCCommand& command) const;
+    proto::RPCResponse lookup_account_id(
+        const proto::RPCCommand& command) const;
     proto::RPCResponse move_funds(const proto::RPCCommand& command) const;
     proto::RPCResponse register_nym(const proto::RPCCommand& command) const;
+    proto::RPCResponse rename_account(const proto::RPCCommand& command) const;
     proto::RPCResponse send_payment(const proto::RPCCommand& command) const;
     proto::RPCResponse start_client(const proto::RPCCommand& command) const;
     proto::RPCResponse start_server(const proto::RPCCommand& command) const;

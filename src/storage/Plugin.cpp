@@ -36,8 +36,8 @@ bool Plugin::Load(
 {
     if (key.empty()) {
         if (!checking) {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Error: Tried to load empty key" << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                  ": Error: Tried to load empty key.").Flush();
         }
 
         return false;
@@ -88,8 +88,8 @@ bool Plugin::Migrate(
         if (to.Store(false, key, value, targetBucket)) {
             return true;
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Save failure."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Save failure.")
+                  .Flush();
 
             return false;
         }

@@ -165,4 +165,9 @@ void IssuerItem::startup()
     refresh_accounts();
     startup_complete_->On();
 }
+
+IssuerItem::~IssuerItem()
+{
+    for (auto& it : listeners_) { delete it.second; }
+}
 }  // namespace opentxs::ui::implementation

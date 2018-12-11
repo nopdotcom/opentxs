@@ -18,6 +18,7 @@
     "PM8TJfV1DQD6VScd5AWsSax8RgK9cUREe939M1d85MwGCKJukyghX6B5E7kqcCyEYu6Tu1Zv" \
     "dG8aWh6w8KGhSfjgL8fBKuZS6aUjhV9xLV1R16CcgWhw"
 #define CHRIS_NYM_NAME "Chris"
+#define OT_METHOD "opentxs::Test_ContactList::"
 
 using namespace opentxs;
 
@@ -89,8 +90,9 @@ public:
     void IncrementCounter(const std::string& widgetID)
     {
         Lock lock(counter_lock_);
-        otErr << "Widget " << widgetID << " update counter set to "
-              << ++counter_[widgetID] << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Widget ")(widgetID)(" update counter set to ")
+              (++counter_[widgetID])(".").Flush();
     }
 
     int GetCounter(const std::string& widgetID)

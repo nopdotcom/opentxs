@@ -41,7 +41,7 @@ public:
     void reindex(const AccountSummarySortKey& key, const CustomData& custom)
         override;
 
-    ~IssuerItem() = default;
+    ~IssuerItem();
 
 private:
     friend opentxs::Factory;

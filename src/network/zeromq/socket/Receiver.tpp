@@ -62,11 +62,12 @@ template <typename T>
 void Receiver<T>::run_tasks(const Lock& lock) const
 {
     Lock task_lock(task_lock_);
+    auto i = socket_tasks_.begin();
 
-    for (auto i = socket_tasks_.begin(); i != socket_tasks_.end(); ++i) {
+    while (i != socket_tasks_.end()) {
         const auto& [id, cb] = *i;
         task_result_.emplace(id, cb(lock));
-        socket_tasks_.erase(i);
+        i = socket_tasks_.erase(i);
     }
 }
 

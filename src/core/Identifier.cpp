@@ -11,6 +11,7 @@
 #include "opentxs/api/Native.hpp"
 #include "opentxs/core/crypto/OTCachedKey.hpp"
 #include "opentxs/core/crypto/OTPassword.hpp"
+#include "opentxs/core/identifier/Nym.hpp"
 #include "opentxs/core/util/Assert.hpp"
 #include "opentxs/core/Cheque.hpp"
 #include "opentxs/core/Contract.hpp"
@@ -65,6 +66,11 @@ OTIdentifier Identifier::Factory()
     return OTIdentifier(new implementation::Identifier());
 }
 
+OTNymID identifier::Nym::Factory()
+{
+    return OTNymID(new implementation::Identifier());
+}
+
 OTIdentifier Identifier::Factory(const Identifier& rhs)
 {
     return OTIdentifier(rhs.clone());
@@ -75,14 +81,29 @@ OTIdentifier Identifier::Factory(const std::string& rhs)
     return OTIdentifier(new implementation::Identifier(rhs));
 }
 
+OTNymID identifier::Nym::Factory(const std::string& rhs)
+{
+    return OTNymID(new implementation::Identifier(rhs));
+}
+
 OTIdentifier Identifier::Factory(const String& rhs)
 {
     return OTIdentifier(new implementation::Identifier(rhs));
 }
 
-OTIdentifier Identifier::Factory(const Nym& nym)
+OTNymID identifier::Nym::Factory(const String& rhs)
+{
+    return OTNymID(new implementation::Identifier(rhs));
+}
+
+OTIdentifier Identifier::Factory(const opentxs::Nym& nym)
 {
     return OTIdentifier(new implementation::Identifier(nym));
+}
+
+OTNymID identifier::Nym::Factory(const opentxs::Nym& rhs)
+{
+    return OTNymID(new implementation::Identifier(rhs));
 }
 
 OTIdentifier Identifier::Factory(const Contract& contract)
@@ -169,10 +190,10 @@ Identifier::Identifier(const Contract& theContract)
     (const_cast<Contract&>(theContract)).GetIdentifier(*this);
 }
 
-Identifier::Identifier(const Nym& theNym)
+Identifier::Identifier(const opentxs::Nym& theNym)
     : ot_super()  // Get the Nym's ID into this identifier.
 {
-    (const_cast<Nym&>(theNym)).GetIdentifier(*this);
+    (const_cast<opentxs::Nym&>(theNym)).GetIdentifier(*this);
 }
 
 Identifier::Identifier(const crypto::key::LegacySymmetric& theKey)

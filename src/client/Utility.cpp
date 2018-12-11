@@ -271,15 +271,15 @@ std::int32_t Utility::getNymboxLowLevel(bool& bWasSent)
             return nRequestNum;
         } break;
         case SendResult::TIMEOUT: {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to send getNymbox message due to error."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to send getNymbox message due to error.")
+                .Flush();
             setLastReplyReceived("");
 
             return -1;
         } break;
         default: {
-            otErr << OT_METHOD << __FUNCTION__ << ": Error" << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Error!").Flush();
             setLastReplyReceived("");
 
             return -1;
@@ -1382,10 +1382,9 @@ std::int32_t Utility::processNymbox(
 
     // Next, we have to make sure we have all the BOX RECEIPTS downloaded
     // for this Nymbox.
-    const auto [nProcess, trans, result] = api_.OTAPI().processNymbox(context_);
+    [[maybe_unused]] const auto [nProcess, trans, result] =
+        api_.OTAPI().processNymbox(context_);
     const auto& [status, reply] = result;
-    [[maybe_unused]] const auto& notUsed1 = trans;
-    [[maybe_unused]] const auto& notUsed2 = status;
 
     if (-1 == nProcess) {
         LogNormal(OT_METHOD)(__FUNCTION__)(
@@ -1395,6 +1394,19 @@ std::int32_t Utility::processNymbox(
             .Flush();
         return -1;  // (It didn't even send.)
     }
+
+    switch (status) {
+        case SendResult::INVALID_REPLY:
+        case SendResult::TIMEOUT:
+        case SendResult::ERROR: {
+            LogNormal(OT_METHOD)(__FUNCTION__)(": Send error").Flush();
+
+            return -1;
+        }
+        default: {
+        }
+    }
+
     // Nymbox was empty. (So we didn't send any process message because there
     // was nothing to process.)
     if (0 == nProcess) {
@@ -1477,9 +1489,9 @@ bool Utility::getBoxReceiptLowLevel(
             return true;
         } break;
         case SendResult::TIMEOUT: {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to send getNymbox message due to error."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to send getNymbox message due to error.")
+                .Flush();
             setLastReplyReceived("");
 
             return false;
@@ -1488,7 +1500,7 @@ bool Utility::getBoxReceiptLowLevel(
         }
     }
 
-    otErr << OT_METHOD << __FUNCTION__ << ": Error" << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Error!").Flush();
     setLastReplyReceived("");
 
     return false;
@@ -2347,15 +2359,15 @@ std::int32_t Utility::getInboxAccount(
             setLastReplyReceived(String::Factory(*reply)->Get());
         } break;
         case SendResult::TIMEOUT: {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to send getNymbox message due to error."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to send getNymbox message due to error.")
+                .Flush();
             setLastReplyReceived("");
 
             return -1;
         } break;
         default: {
-            otErr << OT_METHOD << __FUNCTION__ << ": Error" << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Error!").Flush();
             setLastReplyReceived("");
 
             return -1;

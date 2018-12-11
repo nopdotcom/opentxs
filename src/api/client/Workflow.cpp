@@ -234,6 +234,71 @@ Workflow::Transfer Workflow::InstantiateTransfer(
     return output;
 }
 
+OTIdentifier Workflow::UUID(
+    const api::Core& core,
+    const proto::PaymentWorkflow& workflow)
+{
+    auto output = Identifier::Factory();
+    auto notaryID = Identifier::Factory();
+    TransactionNumber number{0};
+
+    switch (workflow.type()) {
+        case proto::PAYMENTWORKFLOWTYPE_OUTGOINGCHEQUE:
+        case proto::PAYMENTWORKFLOWTYPE_INCOMINGCHEQUE:
+        case proto::PAYMENTWORKFLOWTYPE_OUTGOINGINVOICE:
+        case proto::PAYMENTWORKFLOWTYPE_INCOMINGINVOICE: {
+            [[maybe_unused]] auto [state, cheque] =
+                InstantiateCheque(core, workflow);
+
+            if (false == bool(cheque)) {
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid cheque").Flush();
+
+                return output;
+            }
+
+            notaryID = cheque->GetNotaryID();
+            number = cheque->GetTransactionNum();
+        } break;
+        case proto::PAYMENTWORKFLOWTYPE_OUTGOINGTRANSFER:
+        case proto::PAYMENTWORKFLOWTYPE_INCOMINGTRANSFER:
+        case proto::PAYMENTWORKFLOWTYPE_INTERNALTRANSFER: {
+            [[maybe_unused]] auto [state, transfer] =
+                InstantiateTransfer(core, workflow);
+
+            if (false == bool(transfer)) {
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid transfer")
+                    .Flush();
+
+                return output;
+            }
+
+            notaryID = transfer->GetPurportedNotaryID();
+            number = transfer->GetTransactionNum();
+        } break;
+        default: {
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Unknown workflow type")
+                .Flush();
+        }
+    }
+
+    return UUID(notaryID, number);
+}
+
+OTIdentifier Workflow::UUID(
+    const Identifier& notary,
+    const TransactionNumber& number)
+{
+    LogTrace(OT_METHOD)(__FUNCTION__)(": UUID for notary ")(notary)(
+        " and transaction number ")(number)(" is ");
+    OTData preimage{notary};
+    preimage->Concatenate(&number, sizeof(number));
+    auto output = Identifier::Factory();
+    output->CalculateDigest(preimage);
+    LogTrace(output).Flush();
+
+    return output;
+}
+
 namespace implementation
 {
 Workflow::Workflow(
@@ -2384,6 +2449,8 @@ void Workflow::update_rpc(
     message->AddFrame();
     message->AddFrame(localNymID);
     message->AddFrame(proto::ProtoAsData(push));
+    const auto instance = api_.Instance();
+    message->AddFrame(Data::Factory(&instance, sizeof(instance)));
     rpc_publisher_->Push(message);
 }
 

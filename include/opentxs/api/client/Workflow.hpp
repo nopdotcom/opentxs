@@ -103,6 +103,12 @@ public:
     static Transfer InstantiateTransfer(
         const api::Core& core,
         const proto::PaymentWorkflow& workflow);
+    static OTIdentifier UUID(
+        const api::Core& core,
+        const proto::PaymentWorkflow& workflow);
+    static OTIdentifier UUID(
+        const Identifier& notary,
+        const TransactionNumber& number);
 
     /** Record a failed transfer attempt */
     EXPORT virtual bool AbortTransfer(

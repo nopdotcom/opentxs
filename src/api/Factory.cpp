@@ -94,7 +94,7 @@ std::unique_ptr<opentxs::Cheque> Factory::Cheque(
     const auto loaded = output->LoadContractFromString(serializedCheque);
 
     if (false == loaded) {
-        otErr << __FUNCTION__ << ": Failed to load cheque," << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to load cheque.").Flush();
     }
 
     return output;
@@ -231,18 +231,19 @@ std::unique_ptr<OTCronItem> Factory::CronItem(const String& strCronItem) const
     std::array<char, 45> buf{};
 
     if (!strCronItem.Exists()) {
-        otErr << __FUNCTION__
-              << ": Empty string was passed in (returning nullptr.)\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Empty string was passed in (returning nullptr).")
+            .Flush();
         return nullptr;
     }
 
     auto strContract = String::Factory(strCronItem.Get());
 
     if (!strContract->DecodeIfArmored(false)) {
-        otErr << __FUNCTION__
-              << ": Input string apparently was encoded and "
-                 "then failed decoding. Contents: \n"
-              << strCronItem << "\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Input string apparently was encoded and "
+            "then failed decoding. Contents: ")(strCronItem)(".")
+            .Flush();
         return nullptr;
     }
 
@@ -358,8 +359,9 @@ std::unique_ptr<opentxs::Item> Factory::Item(
     std::int64_t lTransactionNumber) const
 {
     if (!strItem.Exists()) {
-        otErr << "Item::CreateItemFromString: strItem is empty. (Expected an "
-                 "item.)\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": strItem is empty. (Expected an "
+                                           "item).")
+            .Flush();
         return nullptr;
     }
 
@@ -503,15 +505,16 @@ std::unique_ptr<opentxs::Mint> Factory::Mint() const
     pMint.reset(new MintLucre(api_));
     OT_ASSERT(false != bool(pMint));
 #elif OT_CASH_USING_MAGIC_MONEY
-    otErr << __FUCNTION__
-          << ": Open-Transactions doesn't support Magic Money "
-             "by Pr0duct Cypher (yet), "
-          << "so it's impossible to instantiate a mint.\n";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions doesn't support Magic Money "
+        "by Product Cypher (yet), "
+        "so it's impossible to instantiate a mint.")
+        .Flush();
 #else
-    otErr
-        << __FUNCTION__
-        << ": Open-Transactions isn't built with any digital cash algorithms, "
-        << "so it's impossible to instantiate a mint.\n";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions isn't built with any digital cash algorithms, "
+        "so it's impossible to instantiate a mint.")
+        .Flush();
 #endif
     return pMint;
 }
@@ -526,15 +529,16 @@ std::unique_ptr<opentxs::Mint> Factory::Mint(
     pMint.reset(new MintLucre(api_, strNotaryID, strInstrumentDefinitionID));
     OT_ASSERT(false != bool(pMint));
 #elif OT_CASH_USING_MAGIC_MONEY
-    otErr << __FUNCTION__
-          << ": Open-Transactions doesn't support Magic Money "
-             "by Pr0duct Cypher (yet), "
-          << "so it's impossible to instantiate a mint.\n";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions doesn't support Magic Money "
+        "by Product Cypher (yet), "
+        "so it's impossible to instantiate a mint.")
+        .Flush();
 #else
-    otErr
-        << __FUNCTION__
-        << ": Open-Transactions isn't built with any digital cash algorithms, "
-        << "so it's impossible to instantiate a mint.\n";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions isn't built with any digital cash algorithms, "
+        "so it's impossible to instantiate a mint.")
+        .Flush();
 #endif
     return pMint;
 }
@@ -551,15 +555,16 @@ std::unique_ptr<opentxs::Mint> Factory::Mint(
         api_, strNotaryID, strServerNymID, strInstrumentDefinitionID));
     OT_ASSERT(false != bool(pMint));
 #elif OT_CASH_USING_MAGIC_MONEY
-    otErr << __FUNCTION__
-          << ": Open-Transactions doesn't support Magic Money "
-             "by Pr0duct Cypher (yet), "
-          << "so it's impossible to instantiate a mint.\n";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions doesn't support Magic Money "
+        "by Product Cypher (yet), "
+        "so it's impossible to instantiate a mint.")
+        .Flush();
 #else
-    otErr
-        << __FUNCTION__
-        << ": Open-Transactions isn't built with any digital cash algorithms, "
-        << "so it's impossible to instantiate a mint.\n";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions isn't built with any digital cash algorithms, "
+        "so it's impossible to instantiate a mint.")
+        .Flush();
 #endif
     return pMint;
 }
@@ -765,10 +770,10 @@ std::unique_ptr<opentxs::Purse> Factory::Purse(
                 const auto strNotaryID = String::Factory(NOTARY_ID),
                            strPurseNotaryID =
                                String::Factory(pPurse->GetNotaryID());
-                otErr << "Purse::PurseFactory"
-                      << ": Failure: NotaryID on purse (" << strPurseNotaryID
-                      << ") doesn't match expected server ID (" << strNotaryID
-                      << ").\n";
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Failure: NotaryID on purse (")(strPurseNotaryID)(
+                    ") doesn't match expected server ID (")(strNotaryID)(").")
+                    .Flush();
             } else
                 return pPurse;
         }
@@ -796,16 +801,16 @@ std::unique_ptr<opentxs::Purse> Factory::Purse(
 
         // Does the contract successfully load from the string passed in?
         if (pPurse->LoadContractFromString(strContract)) {
-            const char* szFunc = "Purse::PurseFactory";
+
             if (NOTARY_ID != pPurse->GetNotaryID()) {
                 const auto strNotaryID = String::Factory(NOTARY_ID),
                            strPurseNotaryID =
                                String::Factory(pPurse->GetNotaryID());
-                otErr << szFunc << ": Failure: NotaryID on purse ("
-                      << strPurseNotaryID
-                      << ") doesn't match expected "
-                         "server ID ("
-                      << strNotaryID << ").\n";
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Failure: NotaryID on purse (")(strPurseNotaryID)(
+                    ") doesn't match expected "
+                    "server ID (")(strNotaryID)(").")
+                    .Flush();
             } else if (
                 INSTRUMENT_DEFINITION_ID !=
                 pPurse->GetInstrumentDefinitionID()) {
@@ -813,12 +818,13 @@ std::unique_ptr<opentxs::Purse> Factory::Purse(
                                String::Factory(INSTRUMENT_DEFINITION_ID),
                            strPurseInstrumentDefinitionID = String::Factory(
                                pPurse->GetInstrumentDefinitionID());
-                otErr << szFunc
-                      << ": Failure: InstrumentDefinitionID on purse ("
-                      << strPurseInstrumentDefinitionID
-                      << ") doesn't match expected "
-                         "instrument definition id ("
-                      << strInstrumentDefinitionID << ").\n";
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Failure: InstrumentDefinitionID on purse (")(
+                    strPurseInstrumentDefinitionID)(
+                    ") doesn't match expected "
+                    "instrument definition id (")(strInstrumentDefinitionID)(
+                    ").")
+                    .Flush();
             } else
                 return pPurse;
         }
@@ -886,7 +892,8 @@ std::unique_ptr<OTScriptable> Factory::Scriptable(const String& strInput) const
     std::array<char, 45> buf{};
 
     if (!strInput.Exists()) {
-        otErr << __FUNCTION__ << ": Failure: Input string is empty.\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failure: Input string is empty.")
+            .Flush();
         return nullptr;
     }
 
@@ -895,10 +902,10 @@ std::unique_ptr<OTScriptable> Factory::Scriptable(const String& strInput) const
     if (!strContract->DecodeIfArmored(false))  // bEscapedIsAllowed=true
                                                // by default.
     {
-        otErr << __FUNCTION__
-              << ": Input string apparently was encoded and "
-                 "then failed decoding. Contents: \n"
-              << strInput << "\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Input string apparently was encoded and "
+            "then failed decoding. Contents: ")(strInput)(".")
+            .Flush();
         return nullptr;
     }
 
@@ -1082,7 +1089,9 @@ std::unique_ptr<Token> Factory::Token(
         theNym, theMint, lDenomination, nTokenCount);
 
     if (!bGeneratedRequest) {
-        otErr << __FUNCTION__ << ": Failed trying to generate token request.\n";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Failed trying to generate token request.")
+            .Flush();
     }
 
     return pToken;
@@ -1119,9 +1128,10 @@ std::unique_ptr<opentxs::Token> Factory::TokenLowLevel(
         OT_ASSERT(false != bool(pToken));
     }
 #else
-    otErr << __FUNCTION__
-          << ": Open-Transactions is not built for any digital "
-             "cash algorithms. (Failure.)";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions is not built for any digital "
+        "cash algorithms. (Failure).")
+        .Flush();
 #endif  // OT_CASH_USING_LUCRE
 
     return pToken;
@@ -1154,9 +1164,10 @@ std::unique_ptr<opentxs::Token> Factory::TokenLowLevel(
         OT_ASSERT(false != bool(pToken));
     }
 #else
-    otErr << __FUNCTION__
-          << ": Open-Transactions is not built for any digital "
-             "cash algorithms. (Failure.)";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions is not built for any digital "
+        "cash algorithms. (Failure).")
+        .Flush();
 #endif  // OT_CASH_USING_LUCRE
 
     return pToken;
@@ -1171,9 +1182,10 @@ std::unique_ptr<opentxs::Token> Factory::TokenLowLevel(
     pToken.reset(new Token_Lucre(thePurse.API(), thePurse));
     OT_ASSERT(false != bool(pToken));
 #else
-    otErr << __FUNCTION__
-          << ": Open-Transactions is not built for any digital "
-             "cash algorithms. (Failure.)";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions is not built for any digital "
+        "cash algorithms. (Failure).")
+        .Flush();
 #endif  // OT_CASH_USING_LUCRE
 
     return pToken;
@@ -1205,9 +1217,10 @@ std::unique_ptr<opentxs::Token> Factory::TokenLowLevel(
         OT_ASSERT(false != bool(pToken));
     }
 #else
-    otErr << __FUNCTION__
-          << ": Open-Transactions is not built for any digital "
-             "cash algorithms. (Failure.)";
+    LogOutput(OT_METHOD)(__FUNCTION__)(
+        ": Open-Transactions is not built for any digital "
+        "cash algorithms. (Failure).")
+        .Flush();
 #endif  // OT_CASH_USING_LUCRE
 
     return pToken;

@@ -39,8 +39,8 @@ inline std::string OT_CLI_ReadUntilEOF()
 
             result += input_line;
         } else {
-            opentxs::otErr << "OT_CLI_ReadUntilEOF: getline() was unable to "
-                              "read a string from std::cin\n";
+            opentxs::LogOutput(": getline() was unable to "
+                              "read a string from std::cin.").Flush();
             break;
         }
         if (std::cin.eof() || std::cin.fail() || std::cin.bad()) {

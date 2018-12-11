@@ -137,8 +137,8 @@ public:
             case (proto::KEYROLE_ERROR):
             case (proto::KEYROLE_ENCRYPT):
             default:
-                otErr << __FUNCTION__ << ": Can not sign with the "
-                      << "specified key." << std::endl;
+                LogOutput(": Can not sign with the "
+                      "specified key.").Flush();
                 return false;
         }
 

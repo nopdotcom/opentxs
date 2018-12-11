@@ -50,6 +50,7 @@ typedef int64_t time64_t;
 %include "../../include/opentxs/Types.hpp"
 %include "../../include/opentxs/core/Data.hpp"
 %include "../../include/opentxs/core/Identifier.hpp"
+%include "../../include/opentxs/core/identifier/Nym.hpp"
 %include "../../include/opentxs/core/crypto/OTPassword.hpp"
 %include "../../include/opentxs/core/crypto/OTCallback.hpp"
 %include "../../include/opentxs/core/crypto/OTCaller.hpp"

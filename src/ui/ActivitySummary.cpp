@@ -188,4 +188,9 @@ void ActivitySummary::startup()
 
     startup_complete_->On();
 }
+
+ActivitySummary::~ActivitySummary()
+{
+    for (auto& it : listeners_) { delete it.second; }
+}
 }  // namespace opentxs::ui::implementation

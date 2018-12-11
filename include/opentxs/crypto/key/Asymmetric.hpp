@@ -81,8 +81,8 @@ public:
         const OTPasswordData* pPWData = nullptr) const
     {
         if (IsPublic()) {
-            otErr << "You must use private keys to create signatures."
-                  << std::endl;
+            LogOutput(": You must use private keys to create signatures.")
+                  .Flush();
 
             return false;
         }

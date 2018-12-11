@@ -16,6 +16,7 @@
 
 template class opentxs::Pimpl<opentxs::otx::Request>;
 
+// TODO 1.14.0
 #define OTX_REQUEST_CREATE_VERSION 1
 #define OTX_REQUEST_SIGNATURE_VERSION 3
 
@@ -211,8 +212,8 @@ bool Request::update_signature(const Lock& lock)
     if (success) {
         signatures_.emplace_front(new proto::Signature(signature));
     } else {
-        otErr << OT_METHOD << __FUNCTION__ << ": failed to create signature."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to create signature.")
+            .Flush();
     }
 
     return success;
@@ -225,7 +226,7 @@ bool Request::validate(const Lock& lock) const
     if (nym_) { validNym = nym_->VerifyPseudonym(); }
 
     if (false == validNym) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid nym." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid nym.").Flush();
 
         return false;
     }
@@ -233,14 +234,14 @@ bool Request::validate(const Lock& lock) const
     const bool validSyntax = proto::Validate(full_version(lock), VERBOSE);
 
     if (false == validSyntax) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid syntax." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid syntax.").Flush();
 
         return false;
     }
 
     if (1 != signatures_.size()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong number signatures."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong number signatures.")
+            .Flush();
 
         return false;
     }
@@ -251,8 +252,7 @@ bool Request::validate(const Lock& lock) const
     if (signature) { validSig = verify_signature(lock, *signature); }
 
     if (false == validSig) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid signature."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid signature.").Flush();
 
         return false;
     }

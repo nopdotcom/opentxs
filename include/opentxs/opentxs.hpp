@@ -72,6 +72,7 @@
 #if OT_CRYPTO_SUPPORTED_SOURCE_BIP47
 #include <opentxs/core/crypto/PaymentCode.hpp>
 #endif  // OT_CRYPTO_SUPPORTED_SOURCE_BIP47
+#include <opentxs/core/identifier/Nym.hpp>
 #include <opentxs/core/recurring/OTPaymentPlan.hpp>
 #include <opentxs/core/script/OTScriptable.hpp>
 #include <opentxs/core/script/OTSmartContract.hpp>

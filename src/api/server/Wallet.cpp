@@ -82,21 +82,21 @@ bool Wallet::load_legacy_account(
     const auto signerNym = Nym(server_.NymID());
 
     if (false == bool(signerNym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to load signer nym."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load signer nym.")
+            .Flush();
 
         return false;
     }
 
     if (false == pAccount->VerifySignature(*signerNym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid signature."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid signature.").Flush();
 
         return false;
     }
 
-    otErr << OT_METHOD << __FUNCTION__ << ": Legacy account " << accountID.str()
-          << " exists." << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Legacy account ")(accountID.str())(
+        " exists.")
+        .Flush();
 
     auto serialized = String::Factory();
     auto saved = pAccount->SaveContractRaw(serialized);

@@ -23,7 +23,7 @@ class PayableList final : public PayableListList
 public:
     const Identifier& ID() const override;
 
-    ~PayableList() = default;
+    ~PayableList();
 
 private:
     friend opentxs::Factory;

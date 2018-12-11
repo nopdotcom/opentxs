@@ -125,8 +125,8 @@ bool HDSeed::DecryptSeed(
     const bool haveWords = key->Decrypt(seed.words(), reason, words);
 
     if (!haveWords) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to decrypt words."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to decrypt words.")
+            .Flush();
 
         return false;
     }
@@ -137,8 +137,9 @@ bool HDSeed::DecryptSeed(
         const bool havePassphrase = key->Decrypt(cphrase, reason, phrase);
 
         if (!havePassphrase) {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to decrypt passphrase." << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to decrypt passphrase.")
+                .Flush();
 
             return false;
         }
@@ -181,8 +182,7 @@ std::shared_ptr<proto::AsymmetricKey> HDSeed::GetStorageKey(
     auto seed = Seed(fingerprint, notUsed);
 
     if (false == bool(seed)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to load seed."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load seed.").Flush();
 
         return {};
     }
@@ -228,8 +228,7 @@ std::string HDSeed::SaveSeed(
     const bool haveWords = key->Encrypt(words, empty, reason, encryptedWords);
 
     if (false == haveWords) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to encrypt seed."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to encrypt seed.").Flush();
 
         return "";
     }
@@ -238,8 +237,8 @@ std::string HDSeed::SaveSeed(
         key->Encrypt(passphrase, empty, reason, encryptedPassphrase, false);
 
     if (!havePassphrase) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to encrypt passphrase."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to encrypt passphrase.")
+            .Flush();
 
         return "";
     }
@@ -247,8 +246,7 @@ std::string HDSeed::SaveSeed(
     const bool stored = storage_.Store(serialized, fingerprint);
 
     if (!stored) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to store seed."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to store seed.").Flush();
 
         return "";
     }
@@ -286,8 +284,9 @@ std::string HDSeed::NewSeed() const
         passphrase.setPassword(DEFAULT_PASSPHRASE);
 
         if (false == bip39_.SeedToWords(*entropy, words)) {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Unable to convert entropy to word list." << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Unable to convert entropy to word list.")
+                .Flush();
 
             return {};
         }
@@ -384,8 +383,9 @@ bool HDSeed::UpdateIndex(std::string& seed, const std::uint32_t index) const
     auto serialized = SerializedSeed(seed, oldIndex);
 
     if (oldIndex > index) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Index values must always increase." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Index values must always increase.")
+            .Flush();
 
         return false;
     }

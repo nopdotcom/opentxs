@@ -46,15 +46,15 @@ protected:
     bool verify_lock(const L& lock, const M& mutex) const
     {
         if (lock.mutex() != &mutex) {
-            otErr << "opentxs::Lockable::" << __FUNCTION__
-                  << ": lock is on incorrect mutex" << std::endl;
+            LogOutput(
+                  ": Lock is on incorrect mutex.").Flush();
 
             return false;
         }
 
         if (false == lock.owns_lock()) {
-            otErr << "opentxs::Lockable::" << __FUNCTION__
-                  << ": lock is unlocked" << std::endl;
+            LogOutput(
+                  ": Lock is unlocked.").Flush();
 
             return false;
         }

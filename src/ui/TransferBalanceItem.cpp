@@ -283,8 +283,10 @@ std::string TransferBalanceItem::UUID() const
 {
     if (transfer_) {
 
-        return uuid(
-            transfer_->GetPurportedNotaryID(), transfer_->GetTransactionNum());
+        return api::client::Workflow::UUID(
+                   transfer_->GetPurportedNotaryID(),
+                   transfer_->GetTransactionNum())
+            ->str();
     }
 
     return {};

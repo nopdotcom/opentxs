@@ -140,9 +140,9 @@ public:
     EXPORT static void zeroMemory(void* vMemory, std::uint32_t size);
     EXPORT static void* safe_memcpy(
         void* dest,
-        std::uint32_t dsize,
+        const std::size_t dsize,
         const void* src,
-        std::uint32_t ssize,
+        const std::size_t ssize,
         bool zeroSource = false);
     inline void reset() { position_ = 0; }
     EXPORT std::uint32_t OTfread(std::uint8_t* data, std::uint32_t size);

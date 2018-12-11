@@ -19,6 +19,7 @@ using namespace opentxs;
 #define PAYABLE_LIST_BTC "PAYABLE_LIST_BTC"
 #define PAYABLE_LIST_BCH "PAYABLE_LIST_BCH"
 #define PROFILE "PROFILE"
+#define OT_METHOD "opentxs::Test_Basic::"
 
 namespace
 {
@@ -99,7 +100,8 @@ public:
         WidgetData& data,
         WidgetMap& map)
     {
-        otErr << "Name: " << name << " ID: " << id.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Name: ")(name)(". ID: ")(id)(".").Flush();
         data.emplace(name, std::pair<OTIdentifier, int>({id, 0}));
         map.emplace(id, name);
     }
@@ -515,10 +517,12 @@ public:
         if (0 == incoming.Body().size()) { return; }
 
         const std::string replyType{incoming.Body().at(0)};
-        otErr << "Received " << replyType << " ";
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Received ")(replyType)(".").Flush();
         Lock lock(server_reply_lock_);
         auto& counter = map[replyType];
-        otErr << std::to_string(++counter) << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": ")(std::to_string(++counter))(".").Flush();
     }
 
     void subscribe_sockets()

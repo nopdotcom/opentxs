@@ -106,7 +106,6 @@ Log* Log::pLogger{nullptr};
 const OTString Log::m_strVersion = String::Factory(OPENTXS_VERSION_STRING);
 const OTString Log::m_strPathSeparator = String::Factory("/");
 
-OTLOG_IMPORT OTLogStream otErr(-1);  // logs using OTLog::vOutput(-1)
 
 LogSource LogOutput{-1};
 LogSource LogNormal{0};

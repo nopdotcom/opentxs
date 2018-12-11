@@ -1,0 +1,167 @@
+diff --git a/src/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c b/src/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c
+index f7b82806..33285524 100644
+--- a/src/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c
++++ b/src/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c
+@@ -653,7 +653,7 @@ ge25519_tobytes(unsigned char *s, const ge25519_p2 *h)
+  */
+ 
+ void
+-ge25519_double_scalarmult_vartime(ge25519_p2 *r, const unsigned char *a,
++sodium_ge25519_double_scalarmult_vartime(ge25519_p2 *r, const unsigned char *a,
+                                   const ge25519_p3 *A, const unsigned char *b)
+ {
+     static const ge25519_precomp Bi[8] = {
+@@ -749,7 +749,7 @@ ge25519_double_scalarmult_vartime(ge25519_p2 *r, const unsigned char *a,
+  */
+ 
+ void
+-ge25519_scalarmult(ge25519_p3 *h, const unsigned char *a, const ge25519_p3 *p)
++sodium_ge25519_scalarmult(ge25519_p3 *h, const unsigned char *a, const ge25519_p3 *p)
+ {
+     signed char     e[64];
+     signed char     carry;
+@@ -842,7 +842,7 @@ ge25519_scalarmult(ge25519_p3 *h, const unsigned char *a, const ge25519_p3 *p)
+  */
+ 
+ void
+-ge25519_scalarmult_base(ge25519_p3 *h, const unsigned char *a)
++sodium_ge25519_scalarmult_base(ge25519_p3 *h, const unsigned char *a)
+ {
+     signed char     e[64];
+     signed char     carry;
+diff --git a/src/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c b/src/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c
+index 7b93a724..88d9208a 100644
+--- a/src/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c
++++ b/src/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c
+@@ -145,7 +145,7 @@ crypto_scalarmult_curve25519_ref10_base(unsigned char *q,
+     t[0] &= 248;
+     t[31] &= 127;
+     t[31] |= 64;
+-    ge25519_scalarmult_base(&A, t);
++    sodium_ge25519_scalarmult_base(&A, t);
+     edwards_to_montgomery(pk, A.Y, A.Z);
+     fe25519_tobytes(q, pk);
+ 
+diff --git a/src/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c b/src/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c
+index 0e317cf7..aaf5751a 100644
+--- a/src/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c
++++ b/src/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c
+@@ -45,7 +45,7 @@ crypto_scalarmult_ed25519(unsigned char *q, const unsigned char *n,
+         t[i] = n[i];
+     }
+     _crypto_scalarmult_ed25519_clamp(t);
+-    ge25519_scalarmult(&Q, t, &P);
++    sodium_ge25519_scalarmult(&Q, t, &P);
+     ge25519_p3_tobytes(q, &Q);
+     if (_crypto_scalarmult_ed25519_is_inf(q) != 0 || sodium_is_zero(n, 32)) {
+         return -1;
+@@ -65,7 +65,7 @@ crypto_scalarmult_ed25519_base(unsigned char *q,
+         t[i] = n[i];
+     }
+     _crypto_scalarmult_ed25519_clamp(t);
+-    ge25519_scalarmult_base(&Q, t);
++    sodium_ge25519_scalarmult_base(&Q, t);
+     ge25519_p3_tobytes(q, &Q);
+     if (sodium_is_zero(n, 32) != 0) {
+         return -1;
+diff --git a/src/libsodium/crypto_sign/ed25519/ref10/keypair.c b/src/libsodium/crypto_sign/ed25519/ref10/keypair.c
+index 8bf3cec8..51e9fb8a 100644
+--- a/src/libsodium/crypto_sign/ed25519/ref10/keypair.c
++++ b/src/libsodium/crypto_sign/ed25519/ref10/keypair.c
+@@ -24,7 +24,7 @@ crypto_sign_ed25519_seed_keypair(unsigned char *pk, unsigned char *sk,
+     sk[31] &= 127;
+     sk[31] |= 64;
+ 
+-    ge25519_scalarmult_base(&A, sk);
++    sodium_ge25519_scalarmult_base(&A, sk);
+     ge25519_p3_tobytes(pk, &A);
+ 
+     memmove(sk, seed, 32);
+diff --git a/src/libsodium/crypto_sign/ed25519/ref10/obsolete.c b/src/libsodium/crypto_sign/ed25519/ref10/obsolete.c
+index 03440cfa..728ede46 100644
+--- a/src/libsodium/crypto_sign/ed25519/ref10/obsolete.c
++++ b/src/libsodium/crypto_sign/ed25519/ref10/obsolete.c
+@@ -21,7 +21,7 @@ crypto_sign_edwards25519sha512batch_keypair(unsigned char *pk,
+     sk[0] &= 248;
+     sk[31] &= 127;
+     sk[31] |= 64;
+-    ge25519_scalarmult_base(&A, sk);
++    sodium_ge25519_scalarmult_base(&A, sk);
+     ge25519_p3_tobytes(pk, &A);
+ 
+     return 0;
+@@ -45,10 +45,10 @@ crypto_sign_edwards25519sha512batch(unsigned char       *sm,
+     crypto_hash_sha512_update(&hs, sk + 32, 32);
+     crypto_hash_sha512_update(&hs, m, mlen);
+     crypto_hash_sha512_final(&hs, nonce);
+-    ge25519_scalarmult_base(&A, sk);
++    sodium_ge25519_scalarmult_base(&A, sk);
+     ge25519_p3_tobytes(sig + 32, &A);
+     sc25519_reduce(nonce);
+-    ge25519_scalarmult_base(&R, nonce);
++    sodium_ge25519_scalarmult_base(&R, nonce);
+     ge25519_p3_tobytes(sig, &R);
+     crypto_hash_sha512_init(&hs);
+     crypto_hash_sha512_update(&hs, sig, 32);
+@@ -99,12 +99,12 @@ crypto_sign_edwards25519sha512batch_open(unsigned char       *m,
+     ge25519_p3_to_cached(&Ai, &A);
+     crypto_hash_sha512(h, sm, mlen + 32);
+     sc25519_reduce(h);
+-    ge25519_scalarmult(&cs3, h, &R);
++    sodium_ge25519_scalarmult(&cs3, h, &R);
+     ge25519_add(&csa, &cs3, &Ai);
+     ge25519_p1p1_to_p2(&cs, &csa);
+     ge25519_tobytes(t1, &cs);
+     t1[31] ^= 1 << 7;
+-    ge25519_scalarmult_base(&R, sm + 32 + mlen);
++    sodium_ge25519_scalarmult_base(&R, sm + 32 + mlen);
+     ge25519_p3_tobytes(t2, &R);
+     if (crypto_verify_32(t1, t2) != 0) {
+         return -1;
+diff --git a/src/libsodium/crypto_sign/ed25519/ref10/open.c b/src/libsodium/crypto_sign/ed25519/ref10/open.c
+index c9e8843c..03cd3d52 100644
+--- a/src/libsodium/crypto_sign/ed25519/ref10/open.c
++++ b/src/libsodium/crypto_sign/ed25519/ref10/open.c
+@@ -47,7 +47,7 @@ _crypto_sign_ed25519_verify_detached(const unsigned char *sig,
+     crypto_hash_sha512_final(&hs, h);
+     sc25519_reduce(h);
+ 
+-    ge25519_double_scalarmult_vartime(&R, h, &A, sig + 32);
++    sodium_ge25519_double_scalarmult_vartime(&R, h, &A, sig + 32);
+     ge25519_tobytes(rcheck, &R);
+ 
+     return crypto_verify_32(rcheck, sig) | (-(rcheck == sig)) |
+diff --git a/src/libsodium/crypto_sign/ed25519/ref10/sign.c b/src/libsodium/crypto_sign/ed25519/ref10/sign.c
+index 4df90bdd..a80d02da 100644
+--- a/src/libsodium/crypto_sign/ed25519/ref10/sign.c
++++ b/src/libsodium/crypto_sign/ed25519/ref10/sign.c
+@@ -88,7 +88,7 @@ _crypto_sign_ed25519_detached(unsigned char *sig, unsigned long long *siglen_p,
+     memmove(sig + 32, sk + 32, 32);
+ 
+     sc25519_reduce(nonce);
+-    ge25519_scalarmult_base(&R, nonce);
++    sodium_ge25519_scalarmult_base(&R, nonce);
+     ge25519_p3_tobytes(sig, &R);
+ 
+     _crypto_sign_ed25519_ref10_hinit(&hs, prehashed);
+diff --git a/src/libsodium/include/sodium/private/ed25519_ref10.h b/src/libsodium/include/sodium/private/ed25519_ref10.h
+index 42fcd981..3166164b 100644
+--- a/src/libsodium/include/sodium/private/ed25519_ref10.h
++++ b/src/libsodium/include/sodium/private/ed25519_ref10.h
+@@ -91,13 +91,13 @@ void ge25519_add(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_cached *q);
+ 
+ void ge25519_sub(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_cached *q);
+ 
+-void ge25519_scalarmult_base(ge25519_p3 *h, const unsigned char *a);
++void sodium_ge25519_scalarmult_base(ge25519_p3 *h, const unsigned char *a);
+ 
+-void ge25519_double_scalarmult_vartime(ge25519_p2 *r, const unsigned char *a,
++void sodium_ge25519_double_scalarmult_vartime(ge25519_p2 *r, const unsigned char *a,
+                                        const ge25519_p3 *A,
+                                        const unsigned char *b);
+ 
+-void ge25519_scalarmult(ge25519_p3 *h, const unsigned char *a,
++void sodium_ge25519_scalarmult(ge25519_p3 *h, const unsigned char *a,
+                         const ge25519_p3 *p);
+ 
+ int ge25519_is_canonical(const unsigned char *s);

@@ -85,8 +85,7 @@
 #define CHECK_NYM(a)                                                           \
     {                                                                          \
         if (a.empty()) {                                                       \
-            otErr << OT_METHOD << __FUNCTION__ << ": Invalid " << #a           \
-                  << std::endl;                                                \
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid ")(#a)(".").Flush(); \
                                                                                \
             return Identifier::Factory();                                      \
         }                                                                      \
@@ -97,8 +96,7 @@
         CHECK_NYM(a)                                                           \
                                                                                \
         if (b.empty()) {                                                       \
-            otErr << OT_METHOD << __FUNCTION__ << ": Invalid " << #b           \
-                  << std::endl;                                                \
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid ")(#b)(".").Flush(); \
                                                                                \
             return Identifier::Factory();                                      \
         }                                                                      \
@@ -109,8 +107,7 @@
         CHECK_SERVER(a, b)                                                     \
                                                                                \
         if (c.empty()) {                                                       \
-            otErr << OT_METHOD << __FUNCTION__ << ": Invalid " << #c           \
-                  << std::endl;                                                \
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid ")(#c)(".").Flush(); \
                                                                                \
             return Identifier::Factory();                                      \
         }                                                                      \
@@ -244,7 +241,7 @@ Sync::Sync(
 }
 
 std::pair<bool, std::size_t> Sync::accept_incoming(
-    const rLock& lock [[maybe_unused]],
+    const rLock& lock[[maybe_unused]],
     const std::size_t max,
     const Identifier& accountID,
     ServerContext& context) const
@@ -263,11 +260,14 @@ std::pair<bool, std::size_t> Sync::accept_incoming(
         ~Cleanup()
         {
             if (recover_ && (0 != number_)) {
-                otErr << OT_METHOD << "Cleanup::" << __FUNCTION__
-                      << ": Recovering unused number " << number_ << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Recovering unused number ")(number_)(".")
+                    .Flush();
                 const bool recovered = context_.RecoverAvailableNumber(number_);
 
-                if (false == recovered) { otErr << "Failed" << std::endl; }
+                if (false == recovered) {
+                    LogOutput(OT_METHOD)(__FUNCTION__)("Failed.").Flush();
+                }
             }
         }
 
@@ -293,9 +293,9 @@ std::pair<bool, std::size_t> Sync::accept_incoming(
             return output;
         }
 
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Error instantiating processInbox for account: " << account
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Error instantiating processInbox for account: ")(account)(".")
+            .Flush();
 
         return output;
     }
@@ -315,7 +315,7 @@ std::pair<bool, std::size_t> Sync::accept_incoming(
         return output;
     } else {
         LogOutput(OT_METHOD)(__FUNCTION__)(
-            ": Items to accept in this account: ")(count)
+            ": Items to accept in this account: ")(count)(".")
             .Flush();
     }
 
@@ -331,8 +331,9 @@ std::pair<bool, std::size_t> Sync::accept_incoming(
             transaction = inbox->GetTransaction(number);
 
             if (nullptr == transaction) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Unable to load item: " << number << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load item: ")(
+                    number)(".")
+                    .Flush();
 
                 continue;
             }
@@ -343,11 +344,12 @@ std::pair<bool, std::size_t> Sync::accept_incoming(
                 context.Nym()->ID(), *transaction);
 
             if (workflowUpdated) {
-                otErr << OT_METHOD << __FUNCTION__ << ": Updated workflow."
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Updated workflow.")
+                    .Flush();
             } else {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Failed to update workflow." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Failed to update workflow.")
+                    .Flush();
             }
         }
 
@@ -355,8 +357,9 @@ std::pair<bool, std::size_t> Sync::accept_incoming(
             accountID, true, context, *transaction, *response);
 
         if (!accepted) {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to accept item: " << number << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to accept item: ")(
+                number)(".")
+                .Flush();
 
             return output;
         }
@@ -366,8 +369,8 @@ std::pair<bool, std::size_t> Sync::accept_incoming(
         accountID, context, *response, *inbox);
 
     if (false == finalized) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to finalize response."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to finalize response.")
+            .Flush();
 
         return output;
     }
@@ -401,8 +404,9 @@ bool Sync::AcceptIncoming(
 
         if (false == success) {
             if (0 == retries) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Exceeded maximum retries." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Exceeded maximum retries.")
+                    .Flush();
 
                 return false;
             }
@@ -415,8 +419,9 @@ bool Sync::AcceptIncoming(
                 true);
 
             if (false == download) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Failed to download account files." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Failed to download account files.")
+                    .Flush();
 
                 return false;
             } else {
@@ -427,8 +432,9 @@ bool Sync::AcceptIncoming(
         }
 
         if (0 != remaining) {
-            otErr << OT_METHOD << __FUNCTION__ << ": Accepting " << remaining
-                  << " more items." << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Accepting ")(remaining)(
+                " more items.")
+                .Flush();
         }
     }
 
@@ -476,9 +482,9 @@ Depositability Sync::can_deposit(
 
     if (false == registered) {
         schedule_download_nymbox(recipient, depositServer);
-        otErr << OT_METHOD << __FUNCTION__ << ": Recipient nym "
-              << recipient.str() << " not registered on server "
-              << depositServer->str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Recipient nym ")(recipient)(
+            " not registered on server ")(depositServer)(".")
+            .Flush();
 
         return Depositability::NOT_REGISTERED;
     }
@@ -493,22 +499,24 @@ Depositability Sync::can_deposit(
 
     switch (output) {
         case Depositability::ACCOUNT_NOT_SPECIFIED: {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Multiple valid accounts exist. "
-                  << "This payment can not be automatically deposited"
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Multiple valid accounts exist. "
+                "This payment can not be automatically deposited.")
+                .Flush();
         } break;
         case Depositability::WRONG_ACCOUNT: {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": The specified account is not valid for this payment."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": The specified account is not valid for this payment.")
+                .Flush();
         } break;
         case Depositability::NO_ACCOUNT: {
-            otErr << OT_METHOD << __FUNCTION__ << ": Recipient "
-                  << recipient.str() << " needs an account for "
-                  << unitID->str() << " on server " << depositServer->str()
-                  << std::endl;
+
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Recipient ")(recipient)(
+                " needs an account for ")(unitID)(" on server ")(depositServer)(
+                ".")
+                .Flush();
             schedule_register_account(recipient, depositServer, unitID, "");
+
         } break;
         case Depositability::READY: {
             LogDetail(OT_METHOD)(__FUNCTION__)(": Payment can be deposited.")
@@ -531,8 +539,9 @@ Messagability Sync::can_message(
     auto senderNym = client_.Wallet().Nym(senderNymID);
 
     if (false == bool(senderNym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to load sender nym "
-              << senderNymID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to load sender nym ")(
+            senderNymID)(".")
+            .Flush();
 
         return Messagability::MISSING_SENDER;
     }
@@ -540,9 +549,9 @@ Messagability Sync::can_message(
     const bool canSign = senderNym->HasCapability(NymCapability::SIGN_MESSAGE);
 
     if (false == canSign) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Sender nym "
-              << senderNymID.str() << " can not sign messages (no private key)."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Sender nym ")(senderNymID)(
+            " can not sign messages (no private key).")
+            .Flush();
 
         return Messagability::INVALID_SENDER;
     }
@@ -550,8 +559,9 @@ Messagability Sync::can_message(
     const auto contact = client_.Contacts().Contact(recipientContactID);
 
     if (false == bool(contact)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Recipient contact "
-              << recipientContactID.str() << " does not exist." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Recipient contact ")(
+            recipientContactID)(" does not exist.")
+            .Flush();
 
         return Messagability::MISSING_CONTACT;
     }
@@ -559,9 +569,9 @@ Messagability Sync::can_message(
     const auto nyms = contact->Nyms();
 
     if (0 == nyms.size()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Recipient contact "
-              << recipientContactID.str() << " does not have a nym."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Recipient contact ")(
+            recipientContactID)(" does not have a nym.")
+            .Flush();
 
         return Messagability::CONTACT_LACKS_NYM;
     }
@@ -582,9 +592,9 @@ Messagability Sync::can_message(
             missing_nyms_.Push(Identifier::Random(), id);
         }
 
-        otErr << OT_METHOD << __FUNCTION__ << ": Recipient contact "
-              << recipientContactID.str() << " credentials not available."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Recipient contact ")(
+            recipientContactID)(" credentials not available.")
+            .Flush();
 
         return Messagability::MISSING_RECIPIENT;
     }
@@ -596,9 +606,10 @@ Messagability Sync::can_message(
 
     // TODO maybe some of the other nyms in this contact do specify a server
     if (serverID->empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Recipient contact "
-              << recipientContactID.str() << ", nym " << recipientNymID->str()
-              << ": credentials do not specify a server." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Recipient contact ")(
+            recipientContactID)(", nym ")(recipientNymID)(
+            ": credentials do not specify a server.")
+            .Flush();
         missing_nyms_.Push(Identifier::Random(), recipientNymID);
 
         return Messagability::NO_SERVER_CLAIM;
@@ -609,9 +620,9 @@ Messagability Sync::can_message(
 
     if (false == registered) {
         schedule_download_nymbox(senderNymID, serverID);
-        otErr << OT_METHOD << __FUNCTION__ << ": Sender nym "
-              << senderNymID.str() << " not registered on server "
-              << serverID->str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Sender nym ")(senderNymID)(
+            " not registered on server ")(serverID)(".")
+            .Flush();
 
         return Messagability::UNREGISTERED;
     }
@@ -645,14 +656,13 @@ Messagability Sync::CanMessage(
     const Identifier& recipientContactID) const
 {
     if (senderNymID.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid sender" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid sender.").Flush();
 
         return Messagability::INVALID_SENDER;
     }
 
     if (recipientContactID.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid recipient"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid recipient.").Flush();
 
         return Messagability::MISSING_CONTACT;
     }
@@ -670,9 +680,10 @@ void Sync::check_nym_revision(
 {
     if (context.StaleNym()) {
         const auto& nymID = context.Nym()->ID();
-        otErr << OT_METHOD << __FUNCTION__ << ": Nym " << nymID.str()
-              << " has is newer than version last registered version on server "
-              << context.Server().str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Nym ")(nymID)(
+            " has is newer than version last registered version on server ")(
+            context.Server())(".")
+            .Flush();
         queue.register_nym_.Push(Identifier::Random(), true);
     }
 }
@@ -691,8 +702,9 @@ bool Sync::check_registration(
     if (context) {
         request = context->Request();
     } else {
-        otErr << OT_METHOD << __FUNCTION__ << ": Nym " << nymID.str()
-              << " has never registered on " << serverID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Nym ")(nymID)(
+            " has never registered on ")(serverID)(".")
+            .Flush();
     }
 
     if (0 != request) {
@@ -720,8 +732,9 @@ bool Sync::check_server_contract(const Identifier& serverID) const
 
     if (serverContract) { return true; }
 
-    otErr << OT_METHOD << __FUNCTION__ << ": Server contract for "
-          << serverID.str() << " is not in the wallet." << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Server contract for ")(serverID)(
+        " is not in the wallet.")
+        .Flush();
     missing_servers_.Push(Identifier::Random(), serverID);
 
     return false;
@@ -757,13 +770,14 @@ OTIdentifier Sync::check_server_name(const ServerContext& context) const
 
             return Identifier::Factory(context.RemoteNym().ID());
         } else {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to rename server nym" << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to rename server nym.")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while renaming server nym on server "
-              << serverID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while renaming server nym on server ")(
+            serverID)(".")
+            .Flush();
     }
 
     return null;
@@ -783,8 +797,7 @@ bool Sync::deposit_cheque(
     OT_ASSERT(payment)
 
     if ((false == payment->IsCheque()) && (false == payment->IsVoucher())) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unhandled payment type."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unhandled payment type.").Flush();
 
         return finish_task(taskID, false);
     }
@@ -796,7 +809,7 @@ bool Sync::deposit_cheque(
     const auto loaded = cheque->LoadContractFromString(payment->Payment());
 
     if (false == loaded) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid cheque" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid cheque.").Flush();
 
         return finish_task(taskID, false);
     }
@@ -812,14 +825,15 @@ bool Sync::deposit_cheque(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to deposit cheque:\n"
-                  << String::Factory(*cheque) << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to deposit cheque: ")(
+                String::Factory(*cheque))(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while depositing cheque "
-              << " on server " << serverID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while depositing cheque "
+            "on server ")(serverID)(".")
+            .Flush();
     }
 
     retry.Push(taskID, {accountID, payment});
@@ -889,8 +903,7 @@ OTIdentifier Sync::DepositPayment(
     OT_ASSERT(payment)
 
     if (recipientNymID.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid recipient"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid recipient.").Flush();
 
         return Identifier::Factory();
     }
@@ -913,8 +926,9 @@ OTIdentifier Sync::DepositPayment(
                 queue.deposit_payment_.Push(taskID, {accountIDHint, payment}));
         } break;
         default: {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Unable to queue payment for download" << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Unable to queue payment for download.")
+                .Flush();
         }
     }
 
@@ -961,15 +975,15 @@ bool Sync::download_contract(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Server " << serverID.str()
-                  << " does not have the contract " << contractID.str()
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Server ")(serverID)(
+                " does not have the contract ")(contractID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while downloading contract "
-              << contractID.str() << " from server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while downloading contract ")(contractID)(
+            " from server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -997,14 +1011,15 @@ bool Sync::download_nym(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Server " << serverID.str()
-                  << " does not have nym " << targetNymID.str() << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Server ")(serverID)(
+                " does not have nym ")(targetNymID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while downloading nym "
-              << targetNymID.str() << " from server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while downloading nym ")(targetNymID)(
+            " from server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -1030,15 +1045,17 @@ bool Sync::extract_payment_data(
     OTIdentifier& unitID) const
 {
     if (false == payment.GetRecipientNymID(nymID)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to load recipient nym from instrument" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to load recipient nym from instrument.")
+            .Flush();
 
         return false;
     }
 
     if (false == payment.GetNotaryID(serverID)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to load recipient nym from instrument" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to load recipient nym from instrument.")
+            .Flush();
 
         return false;
     }
@@ -1046,8 +1063,9 @@ bool Sync::extract_payment_data(
     OT_ASSERT(false == serverID->empty())
 
     if (false == payment.GetInstrumentDefinitionID(unitID)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unable to load recipient nym from instrument" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unable to load recipient nym from instrument.")
+            .Flush();
 
         return false;
     }
@@ -1180,8 +1198,9 @@ bool Sync::get_admin(
     context.SetAdminAttempted();
 
     if (success) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Got admin on server "
-              << serverID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Got admin on server ")(serverID)(
+            ".")
+            .Flush();
         context.SetAdminSuccess();
     }
 
@@ -1268,8 +1287,8 @@ bool Sync::issue_unit_definition(
 
     auto unitdefinition = client_.Wallet().UnitDefinition(unitID);
     if (false == bool(unitdefinition)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unit definition not found"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unit definition not found.")
+            .Flush();
 
         return false;
     }
@@ -1286,14 +1305,16 @@ bool Sync::issue_unit_definition(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to issue unit definition for " << unitID.str()
-                  << " on server " << serverID.str() << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to issue unit definition for ")(unitID)(
+                " on server ")(serverID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while issuing unit definition"
-              << " on server " << serverID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while issuing unit definition"
+            " on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -1337,15 +1358,15 @@ bool Sync::message_nym(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Server  " << serverID.str()
-                  << " does not accept message for " << targetNymID.str()
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Server ")(serverID)(
+                " does not accept message for ")(targetNymID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while messaging nym "
-              << targetNymID.str() << " on server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while messaging nym ")(targetNymID)(
+            " on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -1380,16 +1401,16 @@ bool Sync::pay_nym(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Server  " << serverID.str()
-                  << " does not accept (payment) message "
-                     "for "
-                  << targetNymID.str() << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Server ")(serverID)(
+                " does not accept (payment) message "
+                "for ")(targetNymID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while messaging (a payment) to nym "
-              << targetNymID.str() << " on server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while messaging (a payment) to nym ")(
+            targetNymID)(" on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -1419,22 +1440,22 @@ bool Sync::pay_nym_cash(
             const auto messageID = action->MessageID();
 
             if (false == messageID->empty()) {
-                LogVerbose(OT_METHOD)(__FUNCTION__)(": Sent (cash) message  ")(
+                LogVerbose(OT_METHOD)(__FUNCTION__)(": Sent (cash) message ")(
                     messageID)
                     .Flush();
             }
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Server  " << serverID.str()
-                  << " does not accept (cash) message for " << targetNymID.str()
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Server ")(serverID)(
+                " does not accept (cash) message for ")(targetNymID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while messaging (cash) to nym "
-              << targetNymID.str() << " on server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while messaging (cash) to nym ")(
+            targetNymID)(" on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -1578,7 +1599,7 @@ bool Sync::process_inbox(
         return finish_task(taskID, true);
     } else {
         LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to process inbox ")(
-            accountID)
+            accountID)(".")
             .Flush();
     }
 
@@ -1597,8 +1618,9 @@ void Sync::process_notification(const zmq::Message& message) const
     const auto& serverID = notification->Server();
 
     if (false == valid_context(nymID, serverID)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": No context available to handle notification" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": No context available to handle notification.")
+            .Flush();
 
         return;
     }
@@ -1610,9 +1632,9 @@ void Sync::process_notification(const zmq::Message& message) const
             ot_client_.ProcessNotification(notification, context.It());
         } break;
         default: {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Unsupported server reply type: "
-                  << std::to_string(notification->Type()) << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Unsupported server reply type: ")(notification->Type())(".")
+                .Flush();
         }
     }
 }
@@ -1638,15 +1660,16 @@ bool Sync::publish_server_contract(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to publish server contract " << contractID.str()
-                  << " on server " << serverID.str() << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to publish server contract ")(contractID)(
+                " on server ")(serverID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while uploading contract "
-              << contractID.str() << " to server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while uploading contract ")(contractID)(
+            " to server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -1822,7 +1845,7 @@ void Sync::refresh_contacts() const
                     SHUTDOWN()
                     OT_ASSERT(item)
 
-                    const auto& notUsed [[maybe_unused]] = claimID;
+                    const auto& notUsed[[maybe_unused]] = claimID;
                     const OTIdentifier serverID =
                         Identifier::Factory(item->Value());
 
@@ -1875,7 +1898,7 @@ bool Sync::register_account(
         } else {
             LogOutput(OT_METHOD)(__FUNCTION__)(
                 ": Communication error while downloading unit definition ")(
-                unitID)(" on server ")(serverID)
+                unitID)(" on server ")(serverID)(".")
                 .Flush();
 
             return finish_task(taskID, false);
@@ -1894,14 +1917,16 @@ bool Sync::register_account(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to register account for " << unitID.str()
-                  << " on server " << serverID.str() << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to register account for ")(unitID)(" on server ")(
+                serverID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while registering account "
-              << " on server " << serverID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while registering account "
+            "on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -1927,14 +1952,15 @@ bool Sync::register_nym(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Server " << serverID.str()
-                  << " did not accept registration for nym " << nymID.str()
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Server ")(serverID)(
+                " did not accept registration for nym ")(nymID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while registering nym " << nymID.str()
-              << " on server " << serverID.str() << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while registering nym ")(nymID)(
+            " on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -2158,15 +2184,16 @@ bool Sync::send_transfer(
         if (action->Reply()->m_bSuccess) {
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Failed to send transfer "
-                  << "to " << serverID.str() << " for account "
-                  << targetAccountID.str() << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to send transfer "
+                "to ")(serverID)(" for account ")(targetAccountID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while sending transfer to account "
-              << targetAccountID.str() << " on server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while sending transfer to account ")(
+            targetAccountID)(" on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -2184,7 +2211,7 @@ OTIdentifier Sync::SendCheque(
     CHECK_ARGS(localNymID, sourceAccountID, recipientContactID)
 
     if (0 >= value) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid amount" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid amount.").Flush();
 
         return Identifier::Factory();
     }
@@ -2192,7 +2219,7 @@ OTIdentifier Sync::SendCheque(
     const auto contact = client_.Contacts().Contact(recipientContactID);
 
     if (false == bool(contact)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid contact" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid contact.").Flush();
 
         return Identifier::Factory();
     }
@@ -2200,8 +2227,8 @@ OTIdentifier Sync::SendCheque(
     const auto nyms = contact->Nyms(false);
 
     if (0 == nyms.size()) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Contact can not receive cheques" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Contact can not receive cheques.")
+            .Flush();
 
         return Identifier::Factory();
     }
@@ -2211,7 +2238,7 @@ OTIdentifier Sync::SendCheque(
     auto account = client_.Wallet().Account(sourceAccountID);
 
     if (false == bool(account)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid account" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid account.").Flush();
 
         return Identifier::Factory();
     }
@@ -2229,8 +2256,7 @@ OTIdentifier Sync::SendCheque(
         recipientNymID));
 
     if (false == bool(cheque)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to write cheque"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to write cheque.").Flush();
 
         return Identifier::Factory();
     }
@@ -2240,14 +2266,14 @@ OTIdentifier Sync::SendCheque(
     OT_ASSERT(false != bool(payment));
 
     if (false == bool(cheque)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to instantiate payment"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to instantiate payment.")
+            .Flush();
 
         return Identifier::Factory();
     }
 
     if (false == payment->SetTempValues()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid payment" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid payment.").Flush();
 
         return Identifier::Factory();
     }
@@ -2271,22 +2297,21 @@ OTIdentifier Sync::SendExternalTransfer(
     auto sourceAccount = client_.Wallet().Account(sourceAccountID);
 
     if (false == bool(sourceAccount)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid source account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid source account.").Flush();
 
         return Identifier::Factory();
     }
 
     if (sourceAccount.get().GetNymID() != localNymID) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong owner on source account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong owner on source account.")
+            .Flush();
 
         return Identifier::Factory();
     }
 
     if (sourceAccount.get().GetRealNotaryID() != serverID) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong notary on source account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong notary on source account.")
+            .Flush();
 
         return Identifier::Factory();
     }
@@ -2314,22 +2339,21 @@ OTIdentifier Sync::SendTransfer(
     auto targetAccount = client_.Wallet().Account(targetAccountID);
 
     if (false == bool(targetAccount)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid target account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid target account.").Flush();
 
         return Identifier::Factory();
     }
 
     if (targetAccount.get().GetNymID() != localNymID) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong owner on target account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong owner on target account.")
+            .Flush();
 
         return Identifier::Factory();
     }
 
     if (targetAccount.get().GetRealNotaryID() != serverID) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong notary on target account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong notary on target account.")
+            .Flush();
 
         return Identifier::Factory();
     }
@@ -2337,30 +2361,31 @@ OTIdentifier Sync::SendTransfer(
     auto sourceAccount = client_.Wallet().Account(sourceAccountID);
 
     if (false == bool(sourceAccount)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid source account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid source account.").Flush();
 
         return Identifier::Factory();
     }
 
     if (sourceAccount.get().GetNymID() != localNymID) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong owner on source account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong owner on source account.")
+            .Flush();
 
         return Identifier::Factory();
     }
 
     if (sourceAccount.get().GetRealNotaryID() != serverID) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong notary on source account"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong notary on source account.")
+            .Flush();
 
         return Identifier::Factory();
     }
 
     if (sourceAccount.get().GetInstrumentDefinitionID() !=
         targetAccount.get().GetInstrumentDefinitionID()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Source and target account"
-              << " instrument definition ids don't match" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Source and target account"
+            " instrument definition ids don't match.")
+            .Flush();
 
         return Identifier::Factory();
     }
@@ -2563,9 +2588,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             SHUTDOWN()
 
             if (targetID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty serverID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty serverID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2574,7 +2599,7 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
                     .Flush();
             }
 
-            const auto& notUsed [[maybe_unused]] = taskID;
+            const auto& notUsed[[maybe_unused]] = taskID;
             find_server(nymID, serverID, targetID);
         }
 
@@ -2584,9 +2609,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             SHUTDOWN()
 
             if (contractID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty contract ID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty contract ID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2607,8 +2632,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             SHUTDOWN()
 
             if (targetID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty nymID get in here?" << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty nymID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2617,7 +2643,7 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
                     .Flush();
             }
 
-            const auto& notUsed [[maybe_unused]] = taskID;
+            const auto& notUsed[[maybe_unused]] = taskID;
             find_nym(nymID, serverID, targetID);
         }
 
@@ -2629,8 +2655,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             SHUTDOWN()
 
             if (targetNymID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty nymID get in here?" << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty nymID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2648,8 +2675,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             SHUTDOWN()
 
             if (targetNymID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty nymID get in here?" << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty nymID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2669,9 +2697,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             const auto& [recipientID, text] = message;
 
             if (recipientID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty recipient nymID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty recipient nymID get in here?")
+                    .Flush();
 
                 continue;
             }
@@ -2698,17 +2726,17 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
                 sendCheque;
 
             if (accountID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty account ID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty account ID get in here?")
+                    .Flush();
 
                 continue;
             }
 
             if (recipientID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty recipient nymID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty recipient nymID get in here?")
+                    .Flush();
 
                 continue;
             }
@@ -2735,9 +2763,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             auto& [recipientID, pPayment] = payment;
 
             if (recipientID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty recipient nymID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty recipient nymID get in here?")
+                    .Flush();
 
                 continue;
             }
@@ -2756,9 +2784,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             auto& [recipientID, pRecipientPurse, pSenderPurse] = cash_payment;
 
             if (recipientID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty recipient nymID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty recipient nymID get in here?")
+                    .Flush();
 
                 continue;
             }
@@ -2780,9 +2808,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             SHUTDOWN()
 
             if (accountID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty account ID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty account ID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2804,8 +2832,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             const auto& [unitID, label] = registerAccount;
 
             if (unitID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty unit ID get in here?" << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty unit ID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2827,8 +2856,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             const auto& [unitID, label] = issueUnit;
 
             if (unitID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty unit ID get in here?" << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty unit ID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -2871,9 +2901,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
                     depositPaymentRetry.Push(taskID, deposit);
                 } break;
                 default: {
-                    otErr << OT_METHOD << __FUNCTION__
-                          << ": Permanent failure trying to deposit payment"
-                          << std::endl;
+                    LogOutput(OT_METHOD)(__FUNCTION__)(
+                        ": Permanent failure trying to deposit payment.")
+                        .Flush();
                 }
             }
         }
@@ -2909,9 +2939,9 @@ void Sync::state_machine(const ContextID id, OperationQueue& queue) const
             SHUTDOWN()
 
             if (contractID->empty()) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": How did an empty contract ID get in here?"
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": How did an empty contract ID get in here?")
+                    .Flush();
 
                 continue;
             } else {
@@ -3070,14 +3100,15 @@ bool Sync::valid_context(const Identifier& nymID, const Identifier& serverID)
     const auto nyms = client_.Wallet().LocalNyms();
 
     if (0 == nyms.count(nymID)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Nym " << nymID.str()
-              << " does not belong to this wallet." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Nym ")(nymID)(
+            " does not belong to this wallet.")
+            .Flush();
 
         return false;
     }
 
     if (serverID.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid server" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid server.").Flush();
 
         return false;
     }
@@ -3085,15 +3116,15 @@ bool Sync::valid_context(const Identifier& nymID, const Identifier& serverID)
     const auto context = client_.Wallet().ServerContext(nymID, serverID);
 
     if (false == bool(context)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Context does not exist"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Context does not exist.").Flush();
 
         return false;
     }
 
     if (0 == context->Request()) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Nym is not registered at this server" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Nym is not registered at this server.")
+            .Flush();
 
         return false;
     }
@@ -3107,8 +3138,9 @@ Depositability Sync::valid_recipient(
     const Identifier& recipient) const
 {
     if (specified.empty()) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Payment can be accepted by any nym" << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Payment can be accepted by any nym.")
+            .Flush();
 
         return Depositability::READY;
     }
@@ -3135,7 +3167,7 @@ bool Sync::write_and_send_cheque(
     OT_ASSERT(false == targetNymID.empty())
 
     if (0 >= value) {
-        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid amount").Flush();
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid amount.").Flush();
 
         return finish_task(taskID, false);
     }
@@ -3144,7 +3176,7 @@ bool Sync::write_and_send_cheque(
 
     if (false == downloaded) {
         LogOutput(OT_METHOD)(__FUNCTION__)(
-            ": Failed to get nymbox (before transaction numbers)")
+            ": Failed to get nymbox (before transaction numbers).")
             .Flush();
 
         return finish_task(taskID, false);
@@ -3155,7 +3187,7 @@ bool Sync::write_and_send_cheque(
 
     if (false == gotnumbers) {
         LogOutput(OT_METHOD)(__FUNCTION__)(
-            ": Failed to get transaction numbers")
+            ": Failed to get transaction numbers.")
             .Flush();
 
         return finish_task(taskID, false);
@@ -3165,7 +3197,7 @@ bool Sync::write_and_send_cheque(
 
     if (false == downloaded) {
         LogOutput(OT_METHOD)(__FUNCTION__)(
-            ": Failed to get nymbox (after transaction numbers)")
+            ": Failed to get nymbox (after transaction numbers).")
             .Flush();
 
         return finish_task(taskID, false);
@@ -3182,7 +3214,7 @@ bool Sync::write_and_send_cheque(
         targetNymID));
 
     if (false == bool(cheque)) {
-        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to write cheque").Flush();
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to write cheque.").Flush();
 
         return finish_task(taskID, false);
     }
@@ -3190,14 +3222,14 @@ bool Sync::write_and_send_cheque(
     auto payment{client_.Factory().Payment(String::Factory(*cheque))};
 
     if (false == bool(payment)) {
-        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to instantiate payment")
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to instantiate payment.")
             .Flush();
 
         return finish_task(taskID, false);
     }
 
     if (false == payment->SetTempValues()) {
-        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid payment").Flush();
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid payment.").Flush();
 
         return finish_task(taskID, false);
     }
@@ -3221,16 +3253,16 @@ bool Sync::write_and_send_cheque(
 
             return finish_task(taskID, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__ << ": Server  " << serverID.str()
-                  << " does not accept (payment) message "
-                     "for "
-                  << targetNymID.str() << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Server ")(serverID)(
+                " does not accept (payment) message "
+                "for ")(targetNymID)(".")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Communication error while messaging (a payment) to nym "
-              << targetNymID.str() << " on server " << serverID.str()
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Communication error while messaging (a payment) to nym ")(
+            targetNymID)(" on server ")(serverID)(".")
+            .Flush();
     }
 
     return finish_task(taskID, false);
@@ -3239,7 +3271,7 @@ bool Sync::write_and_send_cheque(
 Sync::~Sync()
 {
     for (auto& [id, thread] : state_machines_) {
-        const auto& notUsed [[maybe_unused]] = id;
+        const auto& notUsed[[maybe_unused]] = id;
 
         OT_ASSERT(thread)
 

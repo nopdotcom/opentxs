@@ -231,15 +231,15 @@ public:
                 break;
             }
             case (proto::SIGROLE_NYMIDSOURCE): {
-                otErr << __FUNCTION__ << ": Credentials to be signed "
-                      << "with a nym source can not use this method."
-                      << std::endl;
+                LogOutput(": Credentials to be signed "
+                      "with a nym source can not use this method.")
+                      .Flush();
 
                 return false;
             }
             case (proto::SIGROLE_PRIVCREDENTIAL): {
-                otErr << __FUNCTION__ << ": Private credential can not "
-                      << "use this method." << std::endl;
+                LogOutput(": Private credential can not "
+                      "use this method.").Flush();
 
                 return false;
             }

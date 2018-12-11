@@ -98,22 +98,19 @@ bool Pair::AddIssuer(
     const std::string& pairingCode) const
 {
     if (localNymID.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid local nym id."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid local nym id.").Flush();
 
         return false;
     }
 
     if (!client_.Wallet().IsLocalNym(localNymID.str())) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid local nym"
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid local nym.").Flush();
 
         return false;
     }
 
     if (issuerNymID.empty()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid issuer nym id."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid issuer nym id.").Flush();
 
         return false;
     }
@@ -139,8 +136,9 @@ bool Pair::CheckIssuer(
     const auto contract = client_.Wallet().UnitDefinition(unitDefinitionID);
 
     if (false == bool(contract)) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Unit definition contract does not exist." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Unit definition contract does not exist.")
+            .Flush();
 
         return false;
     }
@@ -317,8 +315,7 @@ void Pair::process_connection_info(
         client_.Wallet().PeerRequestComplete(nymID, replyID);
         update_.Push(Identifier::Random(), true);
     } else {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to add reply."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to add reply.").Flush();
     }
 }
 
@@ -334,8 +331,9 @@ void Pair::process_peer_replies(const Lock& lock, const Identifier& nymID) const
             nymID, replyID, StorageBox::INCOMINGPEERREPLY);
 
         if (false == bool(reply)) {
-            otErr << OT_METHOD << __FUNCTION__ << ": Failed to load peer reply "
-                  << it.first << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to load peer reply ")(
+                it.first)(".")
+                .Flush();
 
             continue;
         }
@@ -344,23 +342,26 @@ void Pair::process_peer_replies(const Lock& lock, const Identifier& nymID) const
 
         switch (type) {
             case proto::PEERREQUEST_BAILMENT: {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Received bailment reply." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(": Received bailment reply.")
+                    .Flush();
                 process_request_bailment(lock, nymID, *reply);
             } break;
             case proto::PEERREQUEST_OUTBAILMENT: {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Received outbailment reply." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Received outbailment reply.")
+                    .Flush();
                 process_request_outbailment(lock, nymID, *reply);
             } break;
             case proto::PEERREQUEST_CONNECTIONINFO: {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Received connection info reply." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Received connection info reply.")
+                    .Flush();
                 process_connection_info(lock, nymID, *reply);
             } break;
             case proto::PEERREQUEST_STORESECRET: {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Received store secret reply." << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Received store secret reply.")
+                    .Flush();
                 process_store_secret(lock, nymID, *reply);
             } break;
             case proto::PEERREQUEST_ERROR:
@@ -388,8 +389,9 @@ void Pair::process_peer_requests(const Lock& lock, const Identifier& nymID)
             nymID, requestID, StorageBox::INCOMINGPEERREQUEST, time);
 
         if (false == bool(request)) {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to load peer request " << it.first << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to load peer request ")(it.first)(".")
+                .Flush();
 
             continue;
         }
@@ -398,9 +400,9 @@ void Pair::process_peer_requests(const Lock& lock, const Identifier& nymID)
 
         switch (type) {
             case proto::PEERREQUEST_PENDINGBAILMENT: {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Received pending bailment notification."
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Received pending bailment notification.")
+                    .Flush();
                 process_pending_bailment(lock, nymID, *request);
             } break;
             case proto::PEERREQUEST_ERROR:
@@ -442,8 +444,9 @@ void Pair::process_pending_bailment(
         if (!originalRequest->empty()) {
             issuer.SetUsed(proto::PEERREQUEST_BAILMENT, originalRequest, true);
         } else {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Failed to set request as used on issuer." << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Failed to set request as used on issuer.")
+                .Flush();
         }
 
         auto action = client_.ServerAction().AcknowledgeNotice(
@@ -459,8 +462,7 @@ void Pair::process_pending_bailment(
             update_.Push(Identifier::Random(), true);
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to add request."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to add request.").Flush();
     }
 }
 
@@ -485,8 +487,7 @@ void Pair::process_request_bailment(
         client_.Wallet().PeerRequestComplete(nymID, replyID);
         update_.Push(Identifier::Random(), true);
     } else {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to add reply."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to add reply.").Flush();
     }
 }
 
@@ -511,8 +512,7 @@ void Pair::process_request_outbailment(
         client_.Wallet().PeerRequestComplete(nymID, replyID);
         update_.Push(Identifier::Random(), true);
     } else {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to add reply."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to add reply.").Flush();
     }
 }
 
@@ -548,13 +548,12 @@ void Pair::process_store_secret(
                 ": Published store secret notification.")
                 .Flush();
         } else {
-            otErr << OT_METHOD << __FUNCTION__
-                  << ": Error Publishing store secret notification."
-                  << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(
+                ": Error Publishing store secret notification.")
+                .Flush();
         }
     } else {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to add reply."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to add reply.").Flush();
     }
 }
 
@@ -640,8 +639,8 @@ void Pair::state_machine(
     const auto issuerNym = client_.Wallet().Nym(issuerNymID);
 
     if (false == bool(issuerNym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Issuer nym not yet downloaded."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Issuer nym not yet downloaded.")
+            .Flush();
         queue_nym_download(localNymID, issuerNymID);
         status = Status::Error;
 
@@ -657,8 +656,9 @@ void Pair::state_machine(
     const auto haveAccounts = bool(contractSection);
 
     if (serverID->empty()) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Issuer nym does not advertise a server." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Issuer nym does not advertise a server.")
+            .Flush();
         // Maybe there's a new version
         queue_nym_download(localNymID, issuerNymID);
         status = Status::Error;
@@ -669,8 +669,9 @@ void Pair::state_machine(
     SHUTDOWN()
 
     if (false == haveAccounts) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Issuer does not advertise any contracts." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(
+            ": Issuer does not advertise any contracts.")
+            .Flush();
     } else {
         LogDetail(OT_METHOD)(__FUNCTION__)(": Issuer advertises ")(
             contractSection->Size())(" contract")(
@@ -695,16 +696,17 @@ void Pair::state_machine(
         }
         case Status::Started: {
             if (need_registration(localNymID, serverID)) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Local nym not registered on issuer's notary."
-                      << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Local nym not registered on issuer's notary.")
+                    .Flush();
                 auto contract = client_.Wallet().Server(serverID);
 
                 SHUTDOWN()
 
                 if (false == bool(contract)) {
-                    otErr << OT_METHOD << __FUNCTION__
-                          << ": Waiting on server contract." << std::endl;
+                    LogOutput(OT_METHOD)(__FUNCTION__)(
+                        ": Waiting on server contract.")
+                        .Flush();
                     queue_server_contract(localNymID, serverID);
 
                     return;
@@ -752,10 +754,9 @@ void Pair::state_machine(
                             ": Published should rename notification.")
                             .Flush();
                     } else {
-                        otErr
-                            << OT_METHOD << __FUNCTION__
-                            << ": Error publishing should rename notification."
-                            << std::endl;
+                        LogOutput(OT_METHOD)(__FUNCTION__)(
+                            ": Error publishing should rename notification.")
+                            .Flush();
                     }
                 }
             }
@@ -763,8 +764,9 @@ void Pair::state_machine(
             SHUTDOWN()
 
             if (needStoreSecret) {
-                otErr << OT_METHOD << __FUNCTION__
-                      << ": Sending store secret peer request" << std::endl;
+                LogOutput(OT_METHOD)(__FUNCTION__)(
+                    ": Sending store secret peer request.")
+                    .Flush();
                 const auto [sent, requestID] =
                     store_secret(localNymID, issuerNymID, serverID);
 
@@ -785,9 +787,9 @@ void Pair::state_machine(
                                    proto::CONNECTIONINFO_BTCRPC)));
 
                 if (needInfo) {
-                    otErr << OT_METHOD << __FUNCTION__
-                          << ": Sending connection info peer request"
-                          << std::endl;
+                    LogOutput(OT_METHOD)(__FUNCTION__)(
+                        ": Sending connection info peer request.")
+                        .Flush();
                     const auto [sent, requestID] = get_connection(
                         localNymID,
                         issuerNymID,
@@ -820,10 +822,10 @@ void Pair::state_machine(
                             issuer.AccountList(type, unitID);
 
                         if (0 == accountList.size()) {
-                            otErr << OT_METHOD << __FUNCTION__
-                                  << ": Registering " << unitID->str()
-                                  << " account for " << localNymID.str()
-                                  << " on " << serverID->str() << std::endl;
+                            LogOutput(OT_METHOD)(__FUNCTION__)(
+                                ": Registering ")(unitID)(" account for ")(
+                                localNymID)(" on ")(serverID)(".")
+                                .Flush();
                             const auto& [registered, accountID] =
                                 register_account(localNymID, serverID, unitID);
 
@@ -847,9 +849,9 @@ void Pair::state_machine(
                             (false == issuer.BailmentInitiated(unitID));
 
                         if (needBailment && nonePending) {
-                            otErr << OT_METHOD << __FUNCTION__
-                                  << ": Requesting bailment info for "
-                                  << String::Factory(unitID) << std::endl;
+                            LogOutput(OT_METHOD)(__FUNCTION__)(
+                                ": Requesting bailment info for ")(unitID)(".")
+                                .Flush();
                             const auto& [sent, requestID] = initiate_bailment(
                                 localNymID, serverID, issuerNymID, unitID);
 

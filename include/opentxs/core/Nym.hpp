@@ -194,14 +194,14 @@ public:
                     haveSig = true;
                     break;
                 } else {
-                    otErr << __FUNCTION__ << ": Credential set "
-                          << it.second->GetMasterCredID() << " could not "
-                          << "sign protobuf." << std::endl;
+                    LogOutput(": Credential set ")
+                          (it.second->GetMasterCredID())(" could not "
+                          "sign protobuf.").Flush();
                 }
             }
 
-            otErr << __FUNCTION__ << ": Did not find any credential sets "
-                  << "capable of signing on this nym." << std::endl;
+            LogOutput(": Did not find any credential sets "
+                  "capable of signing on this nym.").Flush();
         }
 
         return haveSig;

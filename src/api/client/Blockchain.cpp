@@ -93,8 +93,7 @@ std::shared_ptr<proto::Bip44Account> Blockchain::Account(
     auto account = load_account(accountLock, sNymID, sAccountID);
 
     if (false == bool(account)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account does not exist."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account does not exist.").Flush();
     }
 
     return account;
@@ -189,8 +188,7 @@ std::unique_ptr<proto::Bip44Address> Blockchain::AllocateAddress(
     auto account = load_account(accountLock, sNymID, sAccountID);
 
     if (false == bool(account)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account does not exist."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account does not exist.").Flush();
 
         return output;
     }
@@ -200,7 +198,7 @@ std::unique_ptr<proto::Bip44Address> Blockchain::AllocateAddress(
         chain ? account->internalindex() : account->externalindex();
 
     if (MAX_INDEX == index) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account is full." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account is full.").Flush();
 
         return output;
     }
@@ -212,14 +210,14 @@ std::unique_ptr<proto::Bip44Address> Blockchain::AllocateAddress(
 
     OT_ASSERT(false == newAddress.address().empty());
 
-    otErr << OT_METHOD << __FUNCTION__ << ": Address " << newAddress.address()
-          << " allocated." << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Address ")(newAddress.address())(
+        " allocated.")
+        .Flush();
     newAddress.set_label(label);
     const auto saved = api_.Storage().Store(sNymID, type, *account);
 
     if (false == saved) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to save account."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save account.").Flush();
 
         return output;
     }
@@ -244,8 +242,7 @@ bool Blockchain::AssignAddress(
     auto account = load_account(accountLock, sNymID, sAccountID);
 
     if (false == bool(account)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account does not exist."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account does not exist.").Flush();
 
         return false;
     }
@@ -255,8 +252,8 @@ bool Blockchain::AssignAddress(
         chain ? account->internalindex() : account->externalindex();
 
     if (index > allocatedIndex) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Address has not been allocated." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Address has not been allocated.")
+            .Flush();
 
         return false;
     }
@@ -370,8 +367,7 @@ std::string Blockchain::calculate_address(
     auto serialized = api_.Seeds().AccountChildKey(path, chain, index);
 
     if (false == bool(serialized)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to derive key."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to derive key.").Flush();
 
         return {};
     }
@@ -381,15 +377,14 @@ std::string Blockchain::calculate_address(
         dynamic_cast<const opentxs::crypto::key::Secp256k1*>(&key.get())};
 
     if (false == bool(key.get())) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to instantiate key."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to instantiate key.")
+            .Flush();
 
         return {};
     }
 
     if (nullptr == ecKey) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Incorrect key type."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Incorrect key type.").Flush();
 
         return {};
     }
@@ -397,15 +392,16 @@ std::string Blockchain::calculate_address(
     auto pubkey = Data::Factory();
 
     if (false == ecKey->GetPublicKey(pubkey)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to extract public key."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to extract public key.")
+            .Flush();
 
         return {};
     }
 
     if (COMPRESSED_PUBKEY_SIZE != pubkey->size()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Incorrect pubkey size ("
-              << pubkey->size() << ")." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Incorrect pubkey size (")(
+            pubkey->size())(").")
+            .Flush();
 
         return {};
     }
@@ -415,16 +411,16 @@ std::string Blockchain::calculate_address(
     auto pubkeyHash = Data::Factory();
 
     if (!api_.Crypto().Hash().Digest(proto::HASHTYPE_SHA256, pubkey, sha256)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to calculate sha256."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to calculate sha256.")
+            .Flush();
 
         return {};
     }
 
     if (!api_.Crypto().Hash().Digest(
             proto::HASHTYPE_RIMEMD160, sha256, pubkeyHash)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to calculate rimemd160."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to calculate rimemd160.")
+            .Flush();
 
         return {};
     }
@@ -519,8 +515,7 @@ std::unique_ptr<proto::Bip44Address> Blockchain::LoadAddress(
     auto account = load_account(accountLock, sNymID, sAccountID);
 
     if (false == bool(account)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account does not exist."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account does not exist.").Flush();
 
         return output;
     }
@@ -529,8 +524,8 @@ std::unique_ptr<proto::Bip44Address> Blockchain::LoadAddress(
         chain ? account->internalindex() : account->externalindex();
 
     if (index > allocatedIndex) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Address has not been allocated." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Address has not been allocated.")
+            .Flush();
 
         return output;
     }
@@ -571,8 +566,7 @@ OTIdentifier Blockchain::NewAccount(
     auto existing = api_.Storage().BlockchainAccountList(sNymID, type);
 
     if (0 < existing.size()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account already exists."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account already exists.").Flush();
 
         return Identifier::Factory(*existing.begin());
     }
@@ -580,8 +574,7 @@ OTIdentifier Blockchain::NewAccount(
     auto nym = api_.Wallet().Nym(nymID);
 
     if (false == bool(nym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Nym does not exist."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Nym does not exist.").Flush();
 
         return Identifier::Factory();
     }
@@ -589,19 +582,19 @@ OTIdentifier Blockchain::NewAccount(
     proto::HDPath nymPath{};
 
     if (false == nym->Path(nymPath)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": No nym path." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": No nym path.").Flush();
 
         return Identifier::Factory();
     }
 
     if (0 == nymPath.root().size()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Missing root." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Missing root.").Flush();
 
         return Identifier::Factory();
     }
 
     if (2 > nymPath.child().size()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid path." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid path.").Flush();
 
         return Identifier::Factory();
     }
@@ -630,8 +623,7 @@ OTIdentifier Blockchain::NewAccount(
 
     if (saved) { return accountID; }
 
-    otErr << OT_METHOD << __FUNCTION__ << ": Failed to save account."
-          << std::endl;
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save account.").Flush();
 
     return Identifier::Factory();
 }
@@ -650,8 +642,7 @@ bool Blockchain::StoreIncoming(
     auto account = load_account(accountLock, sNymID, sAccountID);
 
     if (false == bool(account)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account does not exist."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account does not exist.").Flush();
 
         return false;
     }
@@ -660,8 +651,8 @@ bool Blockchain::StoreIncoming(
         chain ? account->internalindex() : account->externalindex();
 
     if (index > allocatedIndex) {
-        otErr << OT_METHOD << __FUNCTION__
-              << ": Address has not been allocated." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Address has not been allocated.")
+            .Flush();
 
         return false;
     }
@@ -681,8 +672,7 @@ bool Blockchain::StoreIncoming(
     auto saved = api_.Storage().Store(sNymID, account->type(), *account);
 
     if (false == saved) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to save account."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save account.").Flush();
 
         return false;
     }
@@ -690,8 +680,8 @@ bool Blockchain::StoreIncoming(
     saved = api_.Storage().Store(transaction);
 
     if (false == saved) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to save transaction."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save transaction.")
+            .Flush();
 
         return false;
     }
@@ -717,8 +707,7 @@ bool Blockchain::StoreOutgoing(
     auto account = load_account(accountLock, sNymID, sAccountID);
 
     if (false == bool(account)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Account does not exist."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Account does not exist.").Flush();
 
         return false;
     }
@@ -728,8 +717,7 @@ bool Blockchain::StoreOutgoing(
     auto saved = api_.Storage().Store(sNymID, account->type(), *account);
 
     if (false == saved) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to save account."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save account.").Flush();
 
         return false;
     }
@@ -737,8 +725,8 @@ bool Blockchain::StoreOutgoing(
     saved = api_.Storage().Store(transaction);
 
     if (false == saved) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to save transaction."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to save transaction.")
+            .Flush();
 
         return false;
     }
@@ -758,8 +746,8 @@ std::shared_ptr<proto::BlockchainTransaction> Blockchain::Transaction(
     std::shared_ptr<proto::BlockchainTransaction> output;
 
     if (false == api_.Storage().Load(txid, output, false)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Failed to load transaction."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to load transaction.")
+            .Flush();
     }
 
     return output;

@@ -23,7 +23,7 @@ class MessagableList final : public MessagableListList
 public:
     const Identifier& ID() const override;
 
-    ~MessagableList() = default;
+    ~MessagableList();
 
 private:
     friend opentxs::Factory;

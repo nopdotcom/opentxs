@@ -21,7 +21,7 @@ using ActivitySummaryList = List<
 class ActivitySummary final : public ActivitySummaryList
 {
 public:
-    ~ActivitySummary() = default;
+    ~ActivitySummary();
 
 private:
     friend opentxs::Factory;

@@ -27,7 +27,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#define CURRENT_VERSION 2
 #define ID_BYTES 32
 
 #define OT_METHOD "opentxs::Contact::"
@@ -36,7 +35,7 @@ namespace opentxs
 {
 Contact::Contact(const api::Wallet& wallet, const proto::Contact& serialized)
     : wallet_(wallet)
-    , version_(check_version(serialized.version(), CURRENT_VERSION))
+    , version_(check_version(serialized.version(), OT_CONTACT_VERSION))
     , label_(serialized.label())
     , lock_()
     , id_(Identifier::Factory(Identifier::Factory(serialized.id())))
@@ -70,7 +69,7 @@ Contact::Contact(const api::Wallet& wallet, const proto::Contact& serialized)
 
 Contact::Contact(const api::Wallet& wallet, const std::string& label)
     : wallet_(wallet)
-    , version_(CURRENT_VERSION)
+    , version_(OT_CONTACT_VERSION)
     , label_(label)
     , lock_()
     , id_(Identifier::Factory(generate_id()))
@@ -172,7 +171,7 @@ bool Contact::add_claim(
     OT_ASSERT(verify_write_lock(lock));
 
     if (false == bool(item)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Null claim." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Null claim.").Flush();
 
         return false;
     }
@@ -182,7 +181,7 @@ bool Contact::add_claim(
 
     if (false == proto::Validate<proto::ContactItem>(
                      serialized, VERBOSE, true, version)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid claim." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid claim.").Flush();
 
         return false;
     }
@@ -208,7 +207,7 @@ bool Contact::add_nym(
     const bool typeMismatch = (contactType != nymType);
 
     if (haveType && typeMismatch) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Wrong nym type." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Wrong nym type.").Flush();
 
         return false;
     }
@@ -358,8 +357,7 @@ bool Contact::AddPaymentCode(
         NULL_END));
 
     if (false == add_claim(claim)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Unable to add claim."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Unable to add claim.").Flush();
 
         return false;
     }
@@ -569,8 +567,9 @@ void Contact::init_nyms()
         nym = wallet_.Nym(nymID);
 
         if (false == bool(nym)) {
-            otErr << OT_METHOD << __FUNCTION__ << ": Failed to load nym "
-                  << String::Factory(nymID) << std::endl;
+            LogOutput(OT_METHOD)(__FUNCTION__)(": Failed to load nym ")(nymID)(
+                ".")
+                .Flush();
         }
     }
 }
@@ -865,8 +864,7 @@ void Contact::Update(const proto::CredentialIndex& serialized)
     auto nym = wallet_.Nym(serialized);
 
     if (false == bool(nym)) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Invalid serialized nym."
-              << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Invalid serialized nym.").Flush();
 
         return;
     }
@@ -909,13 +907,13 @@ void Contact::update_label(const Lock& lock, const Nym& nym)
 bool Contact::verify_write_lock(const Lock& lock) const
 {
     if (lock.mutex() != &lock_) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Incorrect mutex." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Incorrect mutex.").Flush();
 
         return false;
     }
 
     if (false == lock.owns_lock()) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Lock not owned." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Lock not owned.").Flush();
 
         return false;
     }

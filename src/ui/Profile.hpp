@@ -53,7 +53,7 @@ public:
         const std::string& claimID,
         const std::string& value) const override;
 
-    ~Profile() = default;
+    ~Profile();
 
 private:
     friend opentxs::Factory;

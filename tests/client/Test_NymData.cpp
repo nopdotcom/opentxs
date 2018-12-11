@@ -28,24 +28,20 @@ public:
     }
 };
 
-static const auto& paymentCode = "PM8TJKxypQfFUaHfSq59nn82EjdGU4SpHcp2ssa4GxPsh"
-                                 "tzoFtmnjfoRuHpvLiyASD7itH6auPC66jekGjnqToqS9Z"
-                                 "JWWdf1c9L8x4iaFCQ2Gq5hMEFC";
+static const std::string paymentCode{
+    "PM8TJKxypQfFUaHfSq59nn82EjdGU4SpHcp2ssa4GxPshtzoFtmnjfoRuHpvLiyASD7itH6auP"
+    "C66jekGjnqToqS9ZJWWdf1c9L8x4iaFCQ2Gq5hMEFC"};
 
-// This needs to be updated when NYM_CONTACT_DATA_VERSION in Types.hpp changes.
-static const auto& expectedStringOutput =
-    "Version 4 contact data\nSections found: 1\n- Section: Scope, version: 4 "
-    "containing 1 item(s).\n-- Item type: \"Individual\", value: \"testNym\", "
-    "start: 0, end: 0, version: 4\n--- Attributes: Active Primary \n";
-
+static const std::string expectedStringOutput =
+    std::string{"Version "} + std::to_string(NYM_CONTACT_DATA_VERSION) +
+    std::string(
+        " contact data\nSections found: 1\n- Section: Scope, version: ") +
+    std::to_string(NYM_CONTACT_DATA_VERSION) +
+    std::string{" containing 1 item(s).\n-- Item type: \"Individual\", value: "
+                "\"testNym\", start: 0, end: 0, version: "} +
+    std::to_string(NYM_CONTACT_DATA_VERSION) +
+    std::string{"\n--- Attributes: Active Primary \n"};
 }  // namespace
-
-TEST(NymData, Check_Version)
-{
-    ASSERT_EQ(4, NYM_CONTACT_DATA_VERSION)
-        << "Update the assert in this test case and expectedStringOutput if "
-           "NYM_CONTACT_DATA_VERSION has changed.";
-}
 
 //
 // TODO: NymData::AddChildKeyCredential is broken.
@@ -215,7 +211,7 @@ TEST_F(Test_NymData, Claims)
 
     std::string output = contactData;
     ASSERT_TRUE(!output.empty());
-    ASSERT_STREQ(expectedStringOutput, output.c_str());
+    ASSERT_STREQ(expectedStringOutput.c_str(), output.c_str());
 }
 
 TEST_F(Test_NymData, DeleteClaim)
@@ -346,7 +342,7 @@ TEST_F(Test_NymData, PaymentCode)
 
     auto paymentcode = nymData_.PaymentCode(opentxs::proto::CITEMTYPE_BTC);
     ASSERT_TRUE(!paymentcode.empty());
-    ASSERT_STREQ(paymentCode, paymentcode.c_str());
+    ASSERT_STREQ(paymentCode.c_str(), paymentcode.c_str());
 
     paymentcode = nymData_.PaymentCode(opentxs::proto::CITEMTYPE_USD);
     ASSERT_TRUE(paymentcode.empty());
@@ -402,7 +398,7 @@ TEST_F(Test_NymData, PreferredOTServer)
 TEST_F(Test_NymData, PrintContactData)
 {
     const auto& dataString = nymData_.PrintContactData();
-    ASSERT_STREQ(expectedStringOutput, dataString.c_str());
+    ASSERT_STREQ(expectedStringOutput.c_str(), dataString.c_str());
 }
 
 TEST_F(Test_NymData, SetContactData)

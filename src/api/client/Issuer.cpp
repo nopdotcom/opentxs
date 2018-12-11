@@ -257,8 +257,9 @@ bool Issuer::add_request(
     const auto& notUsed[[maybe_unused]] = it;
 
     if (found) {
-        otErr << OT_METHOD << __FUNCTION__ << ": Request "
-              << String::Factory(requestID) << " already exists." << std::endl;
+        LogOutput(OT_METHOD)(__FUNCTION__)(": Request ")(requestID)(
+            " already exists.")
+            .Flush();
 
         return false;
     }

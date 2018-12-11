@@ -9,7 +9,9 @@
 
 namespace opentxs::implementation
 {
-class Identifier final : virtual public opentxs::Identifier, public Data
+class Identifier final : virtual public opentxs::Identifier,
+                         virtual public opentxs::identifier::Nym,
+                         public Data
 {
 public:
     using ot_super = Data;
@@ -41,6 +43,7 @@ public:
 
 private:
     friend opentxs::Identifier;
+    friend opentxs::identifier::Nym;
 
     static const ID DefaultType{ID::BLAKE2B};
     static const std::size_t MinimumSize{10};
@@ -57,7 +60,7 @@ private:
 
     explicit Identifier(const std::string& rhs);
     explicit Identifier(const String& rhs);
-    explicit Identifier(const Nym& nym);
+    explicit Identifier(const opentxs::Nym& nym);
     explicit Identifier(const Contract& contract);
     explicit Identifier(const crypto::key::LegacySymmetric& key);
     explicit Identifier(const OTCachedKey& key);
