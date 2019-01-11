@@ -2445,12 +2445,17 @@ void Workflow::update_rpc(
 
     OT_ASSERT(proto::Validate(push, VERBOSE));
 
+    LogOutput(OT_METHOD)(__FUNCTION__)(": Made it to Jay's question.").Flush();
+
+
+    
     auto message = zmq::Message::Factory();
     message->AddFrame();
     message->AddFrame(localNymID);
     message->AddFrame(proto::ProtoAsData(push));
     const auto instance = api_.Instance();
     message->AddFrame(Data::Factory(&instance, sizeof(instance)));
+    fprintf(stderr, "nymid %s\n", localNymID);
     rpc_publisher_->Push(message);
 }
 
